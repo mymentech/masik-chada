@@ -1,0 +1,841 @@
+================================================================================
+  ময়দানে মুহাম্মাদ (MAIDAN-E-MUHAMMAD)
+  Monthly Subscription & Collection Management System
+  PROJECT SPECIFICATION DOCUMENT v2.0
+================================================================================
+
+  Client      : MymenTech / ময়দানে মুহাম্মাদ
+  Repository  : github.com/mymentech/masik-chada
+  Branch      : MERN
+  Public URL  : subscription.mymentech.com
+  Deployment  : Docker Compose
+  Tech Stack  : React + MongoDB + Express + GraphQL
+  Git Author  : Mozammel Haque <mymentech@gmail.com>
+
+================================================================================
+  TABLE OF CONTENTS
+================================================================================
+
+  1.  Project Overview
+  2.  Technology Stack
+  3.  Project Structure
+  4.  Database & Data Models
+  5.  Critical Bug Fix — Dues Calculation
+  6.  Amnesty / Grace Date Feature
+  7.  GraphQL API
+  8.  Pages & Features
+  9.  Navigation
+  10. Docker & Deployment
+  11. Monthly Cron Job
+  12. Design System
+  13. Existing Data (Migration)
+  14. Task Breakdown
+  15. Important Notes
+
+================================================================================
+  1. PROJECT OVERVIEW
+================================================================================
+
+ময়দানে মুহাম্মাদ is a Bengali-language monthly subscription and donation
+collection management system used by a religious organisation in Bangladesh.
+
+The existing application was built in Laravel with MySQL. It needs to be
+rewritten as a modern MERN stack application while preserving all existing
+functionality, design language, and Bengali UI text exactly as it is.
+
+The system is used primarily on MOBILE DEVICES during live mahfil (gathering)
+events to collect monthly donations from hundreds of donors in a fast-paced,
+crowded environment. Speed, simplicity, and mobile optimisation are critical.
+
+  GOALS
+  -----
+  - Replace Laravel backend with Express.js + Apollo GraphQL
+  - Replace MySQL with MongoDB (migrate all existing data)
+  - Replace Blade templates with React (Vite) + Tailwind CSS
+  - Fix the monthly subscription and dues calculation bug
+  - Add amnesty/grace date feature (due_from field on donors)
+  - Mobile-first Donations page for live collection
+  - Isolate GraphQL API so future Android app can use it without changes
+  - Deploy via Docker Compose at subscription.mymentech.com
+
+================================================================================
+  2. TECHNOLOGY STACK
+================================================================================
+
+  Layer           Technology              Notes
+  --------------- ----------------------- ---------------------------------
+  Frontend        React 18 + Vite         SPA, mobile-first
+  Styling         Tailwind CSS v3         Green theme #16a34a
+  Server State    @tanstack/react-query   Data fetching and caching
+  Forms           react-hook-form         All form handling
+  Icons           lucide-react            Consistent icon set
+  API Client      Apollo Client           GraphQL queries and mutations
+  API Layer       Apollo Server           GraphQL on Express
+  Backend         Express.js + Node 20    Lightweight API server
+  Database        MongoDB + Mongoose      Replaces MySQL
+  Auth            JWT (jsonwebtoken)      7-day token, Bearer header
+  Cron            node-cron               Monthly dues recalculation
+  PDF             pdfkit                  Monthly report download
+  Deployment      Docker Compose + Nginx  subscription.mymentech.com
+
+================================================================================
+  3. PROJECT STRUCTURE
+================================================================================
+
+  masik-chada/  (MERN branch)
+  |
+  |-- backend/
+  |   |-- src/
+  |   |   |-- schema/
+  |   |   |   |-- typeDefs.js        GraphQL type definitions
+  |   |   |   |-- resolvers.js       GraphQL resolvers
+  |   |   |-- models/
+  |   |   |   |-- Donor.js           Mongoose donor model
+  |   |   |   |-- Payment.js         Mongoose payment model
+  |   |   |   |-- User.js            Mongoose user model
+  |   |   |-- middleware/
+  |   |   |   |-- auth.js            JWT verification
+  |   |   |   |-- errorHandler.js    Global error handler
+  |   |   |-- utils/
+  |   |   |   |-- calculateDues.js   ** CRITICAL - dues bug fix **
+  |   |   |-- jobs/
+  |   |   |   |-- recalcDues.js      Monthly cron (1st of month)
+  |   |   |-- scripts/
+  |   |   |   |-- seed.js            MySQL to MongoDB data migration
+  |   |   |-- app.js                 Express + Apollo server entry
+  |   |-- .env                       Environment variables
+  |   |-- Dockerfile
+  |   |-- package.json
+  |
+  |-- frontend/
+  |   |-- src/
+  |   |   |-- pages/
+  |   |   |   |-- Landing.jsx        Public home page
+  |   |   |   |-- Login.jsx          Login page
+  |   |   |   |-- Dashboard.jsx      Stats overview
+  |   |   |   |-- Donations.jsx      ** Mobile-first collection page **
+  |   |   |   |-- Donors.jsx         Donor CRUD management
+  |   |   |   |-- Reports.jsx        Monthly reports + PDF
+  |   |   |-- components/
+  |   |   |   |-- Navbar.jsx         Responsive navigation
+  |   |   |   |-- PaymentModal.jsx   Bottom sheet payment form
+  |   |   |   |-- DonorFormModal.jsx Add/edit donor form
+  |   |   |   |-- PrivateRoute.jsx   Auth guard
+  |   |   |-- graphql/
+  |   |   |   |-- queries.js         Apollo query definitions
+  |   |   |   |-- mutations.js       Apollo mutation definitions
+  |   |   |-- context/
+  |   |   |   |-- AuthContext.jsx    JWT auth state
+  |   |   |-- api/
+  |   |   |   |-- apolloClient.js    Apollo Client setup
+  |   |   |-- index.css              Tailwind + Hind Siliguri font
+  |   |   |-- App.jsx                Routes
+  |   |   |-- main.jsx               Entry point
+  |   |-- Dockerfile
+  |   |-- nginx.conf                 SPA routing (try_files)
+  |   |-- package.json
+  |
+  |-- nginx/
+  |   |-- default.conf               Reverse proxy config
+  |
+  |-- docker-compose.yml
+  |-- masik_db_init.sql              Original data (for migration reference)
+  |-- .gitignore
+
+================================================================================
+  4. DATABASE & DATA MODELS
+================================================================================
+
+  MongoDB replaces MySQL. All data from the SQL backup must be migrated using
+  the seed script at backend/src/scripts/seed.js.
+
+  -----------------------------------------------------------------------
+  4.1  DONOR MODEL  (donors collection)
+  -----------------------------------------------------------------------
+
+  Field               Type        Description
+  ------------------- ----------- -----------------------------------------
+  serial_number       Number      Unique sequential donor number
+  name                String      Full name in Bengali (required)
+  phone               String      Contact number (optional, default +880)
+  address             String      Area / locality (required)
+  monthly_amount      Number      Monthly subscription in BDT (required)
+  registration_date   Date        Date donor joined (required)
+                                  Dues are calculated from this date
+  due_from            Date|null   ** NEW ** Amnesty date — if set, dues
+                                  are calculated from this date instead
+                                  of registration_date
+  created_at          Date        Auto-set on create
+  updated_at          Date        Auto-updated on save
+
+  -----------------------------------------------------------------------
+  4.2  PAYMENT MODEL  (payments collection)
+  -----------------------------------------------------------------------
+
+  Field               Type        Description
+  ------------------- ----------- -----------------------------------------
+  donor_id            ObjectId    Reference to Donor (required)
+  collector_id        ObjectId    Reference to User who collected (required)
+  amount              Number      Payment amount in BDT (required)
+  payment_date        Date        Date payment was received (required)
+  created_at          Date        Auto-set on create
+
+  -----------------------------------------------------------------------
+  4.3  USER MODEL  (users collection)
+  -----------------------------------------------------------------------
+
+  Field               Type        Description
+  ------------------- ----------- -----------------------------------------
+  name                String      Collector / admin name in Bengali
+  email               String      Login email (unique)
+  password            String      bcryptjs hashed password
+  created_at          Date        Auto-set on create
+
+================================================================================
+  5. CRITICAL BUG FIX — DUES CALCULATION
+================================================================================
+
+  !! THIS IS THE MOST IMPORTANT FIX IN THE ENTIRE PROJECT !!
+
+  The original Laravel app calculates monthly dues and outstanding balances
+  incorrectly. The correct logic must be implemented in:
+
+    backend/src/utils/calculateDues.js
+
+  And this single utility must be used everywhere a balance is displayed.
+
+  -----------------------------------------------------------------------
+  5.1  BUSINESS RULES
+  -----------------------------------------------------------------------
+
+  a) A donor's monthly subscription is counted from the month they
+     registered (registration_date field).
+
+  b) If due_from is set on a donor (amnesty date), dues are counted from
+     THAT date instead. All months before due_from are forgiven.
+
+  c) Both the START month and the CURRENT month are INCLUDED in the count
+     (inclusive on both ends).
+
+  d) Outstanding balance = Total Due - Total Paid
+
+  e) On the 1st of every month at 00:01, a cron job must recalculate
+     and create dues records for all donors.
+
+  -----------------------------------------------------------------------
+  5.2  CORRECT CALCULATION LOGIC
+  -----------------------------------------------------------------------
+
+  // backend/src/utils/calculateDues.js
+
+  const { differenceInCalendarMonths, startOfMonth, parseISO } = require('date-fns');
+
+  function calculateTotalDue(donor, upToDate) {
+    upToDate = upToDate || new Date();
+
+    // Use amnesty date if set, otherwise use registration date
+    const startStr = donor.due_from || donor.registration_date;
+    const fromMonth = startOfMonth(parseISO(startStr));
+    const toMonth   = startOfMonth(upToDate);
+
+    // Inclusive: both start month and current month count
+    const months = differenceInCalendarMonths(toMonth, fromMonth) + 1;
+
+    if (months < 1) return 0;
+    return months * parseFloat(donor.monthly_amount);
+  }
+
+  function calculateBalance(donor, totalPaid, upToDate) {
+    const totalDue = calculateTotalDue(donor, upToDate);
+    return totalDue - parseFloat(totalPaid || 0);
+  }
+
+  function getMonthYear(date) {
+    const d = date || new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+
+  module.exports = { calculateTotalDue, calculateBalance, getMonthYear };
+
+  -----------------------------------------------------------------------
+  EXAMPLE
+  -----------------------------------------------------------------------
+
+  Donor registered: January 2025
+  Monthly amount:   100 BDT
+  Current month:    April 2026  (16 months inclusive)
+  Total due:        16 x 100 = 1,600 BDT
+  Total paid:       200 BDT
+  Outstanding:      1,400 BDT  <-- shown in red in the UI
+
+================================================================================
+  6. AMNESTY / GRACE DATE FEATURE  (due_from field)
+================================================================================
+
+  Many donors fall behind on payments for extended periods. The organisation
+  periodically announces a general amnesty — forgiving all previous dues.
+
+  To support this, a due_from date field must be added to every donor record.
+
+  HOW IT WORKS
+  - If due_from is NULL:  dues calculated from registration_date (default)
+  - If due_from is SET:   dues calculated from due_from, all earlier months
+                          are treated as forgiven
+
+  IN THE DONOR FORM (Add/Edit)
+  - Add an optional date picker field labelled:
+    "বকেয়া গণনার তারিখ (সাধারণ ক্ষমার পর)"
+  - Below it, show a yellow info box with this text:
+    "এই তারিখ সেট করলে এর আগের বকেয়া মাফ হয়ে যাবে।
+     খালি রাখলে নিবন্ধনের তারিখ থেকে বকেয়া গণনা করা হবে।"
+  - The field is optional. Submitting it as empty/null keeps the default.
+
+  IN THE API
+  - updateDonor mutation must accept due_from (nullable Date)
+  - createDonor mutation must accept due_from (nullable Date)
+  - All balance calculations must use calculateDues.js utility
+
+================================================================================
+  7. GRAPHQL API
+================================================================================
+
+  All API operations go through a single /graphql endpoint.
+  Authentication: JWT Bearer token in Authorization header.
+  The API must be stable and reusable by the future Android app.
+
+  -----------------------------------------------------------------------
+  7.1  QUERIES
+  -----------------------------------------------------------------------
+
+  me
+    Returns the current authenticated user object.
+
+  donors(search: String, address: String)
+    Returns all donors with current balance calculated.
+    search filters by name or serial_number.
+    address filters by exact address match.
+
+  donor(id: ID!)
+    Returns a single donor with full balance details.
+
+  addresses
+    Returns distinct list of all donor addresses.
+    Used to populate the address filter dropdown.
+
+  payments(month: String)
+    Returns payments for a given month (format: "YYYY-MM").
+
+  donorPayments(donorId: ID!)
+    Returns full payment history for one donor.
+
+  dashboard
+    Returns: totalDonors, thisMonthCollected, totalBalance, totalCollectors
+
+  monthlyReport(month: String!)
+    Returns: collected, totalBalance, byCollector (array of name + total)
+
+  donorsSummary
+    Returns all donors with serial, name, address, monthly_amount, balance.
+    Used for the Donations page list.
+
+  -----------------------------------------------------------------------
+  7.2  MUTATIONS
+  -----------------------------------------------------------------------
+
+  login(email: String!, password: String!)
+    Verifies credentials, returns: { token, user }
+
+  createDonor(input: DonorInput!)
+    Creates new donor. Auto-assigns serial_number (max + 1).
+    Returns the created donor.
+
+  updateDonor(id: ID!, input: DonorInput!)
+    Updates donor including optional due_from amnesty date.
+    Returns updated donor.
+
+  deleteDonor(id: ID!)
+    Deletes donor and all their payment records.
+    Returns: { success: Boolean, message: String }
+
+  recordPayment(donorId: ID!, amount: Float!, paymentDate: String!)
+    Records a payment. Collector is taken from JWT (req.user).
+    Returns the created payment.
+
+  -----------------------------------------------------------------------
+  7.3  DonorInput TYPE
+  -----------------------------------------------------------------------
+
+  input DonorInput {
+    name:              String!
+    phone:             String
+    address:           String!
+    monthly_amount:    Float!
+    registration_date: String!
+    due_from:          String    # nullable — amnesty date
+  }
+
+  -----------------------------------------------------------------------
+  7.4  AUTHENTICATION
+  -----------------------------------------------------------------------
+
+  - login mutation returns JWT token (7-day expiry)
+  - All other queries and mutations require valid Bearer token
+  - Apollo context function extracts and verifies token on every request
+  - On 401, the frontend clears localStorage and redirects to /login
+  - CORS must allow all origins (for future Android app)
+
+================================================================================
+  8. PAGES & FEATURES
+================================================================================
+
+  All pages must match the existing design:
+    - Green (#16a34a) colour theme throughout
+    - Bengali labels on all UI elements
+    - Same navigation structure as existing app
+    - Font: Hind Siliguri (Google Fonts) for Bengali script rendering
+
+  -----------------------------------------------------------------------
+  8.1  LANDING PAGE  (public — /)
+  -----------------------------------------------------------------------
+
+  - Green gradient background (from-green-50 via-white to-green-50)
+  - Organisation logo: letter "ম" in a green circle
+  - Bengali title: ময়দানে মুহাম্মাদ
+  - Subtitle: মাসিক মাহফিল ও চাঁদা ব্যবস্থাপনা সিস্টেম
+  - Three feature cards:
+      * দাতা নিবন্ধন — register new donors
+      * চাঁদা সংগ্রহ — collect donations
+      * রিপোর্ট ও হিসাব — reports and accounts
+  - "লগইন করুন" green button → /login
+  - Footer: © 2026 ময়দানে মুহাম্মাদ — সকল হক সংরক্ষিত
+
+  -----------------------------------------------------------------------
+  8.2  LOGIN PAGE  (/login)
+  -----------------------------------------------------------------------
+
+  - Centred white card with logo
+  - Email field + password field with show/hide toggle
+  - Calls login GraphQL mutation
+  - Stores token and user object in localStorage on success
+  - Redirects to /dashboard on success
+  - Shows error message in Bengali on failure
+  - "← হোমে ফিরে যান" link back to landing
+
+  -----------------------------------------------------------------------
+  8.3  DASHBOARD  (/dashboard)
+  -----------------------------------------------------------------------
+
+  - Page title: ড্যাশবোর্ড
+  - Four stat cards in a 2x2 grid (4 columns on desktop):
+      * মোট দাতা          — total donor count (green icon)
+      * এ মাসের সংগ্রহ    — this month's total collection in BDT (green)
+      * মোট বকেয়া         — total outstanding balance in BDT (orange)
+      * সক্রিয় কালেক্টর  — total collector count (green)
+  - Welcome card below with Bengali description of the system
+  - Show logged-in user name
+  - Skeleton loading placeholders while data fetches
+
+  -----------------------------------------------------------------------
+  8.4  DONATIONS PAGE  (/donations)   ** HIGHEST PRIORITY **
+  -----------------------------------------------------------------------
+
+  This page is used on MOBILE during crowded mahfil sessions for live
+  collection. It must be extremely fast and require minimum taps.
+
+  STRICT UX REQUIREMENTS:
+  - All interactive elements: minimum 48px tap target height
+  - No unnecessary confirmation dialogs
+  - Search results appear instantly (debounced 300ms)
+  - One tap to open payment form, one tap to submit
+
+  LAYOUT:
+  - Sticky header bar (stays at top while list scrolls):
+      * Page title: চাঁদা সংগ্রহ
+      * Search input (full width) — searches by name or serial number
+      * Address filter dropdown beside search
+      * Summary line: "{count} জন দাতা" and "মোট বকেয়া: ৳{total}"
+
+  - Table header row (green background):
+      * Columns: সিরিয়াল | নাম | ঠিকানা | মাসিক চাঁদা | মোট বকেয়া
+
+  - Donor list rows (tap entire row to open payment):
+      * Serial number in small green badge
+      * Donor name (bold)
+      * Address (small gray text below name)
+      * Monthly amount (right side)
+      * Outstanding balance in RED (right side)
+      * If balance is zero or negative: show "✓ পরিশোধিত" in green
+
+  PAYMENT BOTTOM SHEET (opens when a donor row is tapped):
+  - Slides up from bottom on mobile
+  - Centred modal on desktop (sm:max-w-md)
+  - Handle bar at top (mobile only)
+  - Shows donor name, address, serial number
+  - Shows current outstanding balance in red
+  - Amount input field, pre-filled with donor's monthly_amount
+  - Quick-select buttons: ৳50  ৳100  ৳200  ৳500
+  - Date picker defaulting to today
+  - "চাঁদা গ্রহণ করুন" submit button (full width, green, large)
+  - On success:
+      * Show green toast: "{donor name} - চাঁদা গ্রহণ সফল হয়েছে"
+      * Close modal
+      * Refresh donor list (balance updates immediately)
+
+  -----------------------------------------------------------------------
+  8.5  DONOR MANAGEMENT  (/donors)
+  -----------------------------------------------------------------------
+
+  - Page title: দাতা ম্যানেজমেন্ট
+  - "নতুন দাতা যোগ করুন" button (top right)
+  - Search bar (full width) — searches name, serial, phone, address
+  - Table with columns:
+      * সিরিয়াল | নাম | ফোন | ঠিকানা | মাসিক চাঁদা | অ্যাকশন
+  - Action buttons per row: এডিট (blue) | ডিলিট (red)
+  - Footer row showing total donor count
+
+  ADD / EDIT DONOR FORM (bottom sheet modal):
+  - Field: নাম * (required)
+  - Field: ফোন (optional, default +880)
+  - Field: ঠিকানা * (required)
+  - Field: মাসিক চাঁদা * with quick-select buttons ৳50, ৳100, ৳200, ৳500
+  - Field: নিবন্ধনের তারিখ * (date picker)
+  - Field: বকেয়া গণনার তারিখ (optional date picker — yellow info box)
+      Yellow info box text:
+      "এই তারিখ সেট করলে এর আগের বকেয়া মাফ হয়ে যাবে।
+       খালি রাখলে নিবন্ধনের তারিখ থেকে বকেয়া গণনা করা হবে।"
+  - Buttons: বাতিল (outline) | যোগ করুন / আপডেট করুন (green)
+  - Serial number is auto-assigned (max existing + 1) on create
+
+  DELETE CONFIRMATION DIALOG:
+  - "নিশ্চিত করুন" heading
+  - Warning: "{name} কে মুছে ফেলবেন? এই দাতার সকল পেমেন্ট রেকর্ডও মুছে যাবে।"
+  - Buttons: বাতিল | মুছুন (red)
+
+  -----------------------------------------------------------------------
+  8.6  REPORTS  (/reports)
+  -----------------------------------------------------------------------
+
+  - Page title: মাসিক রিপোর্ট
+  - Month picker (input type="month") defaulting to current month
+  - "PDF ডাউনলোড" button (top right)
+  - Summary cards:
+      * Green card: এ মাসের মোট সংগ্রহ — ৳{amount}
+      * Red card:   মাস শেষে মোট বকেয়া — ৳{amount}
+  - Table: কালেক্টর অনুযায়ী সংগ্রহ
+      * Columns: কালেক্টর | সংগৃহীত পরিমাণ
+      * Total row at bottom with bold styling
+  - If no collection for the month: "এ মাসে কোনো সংগ্রহ হয়নি"
+
+================================================================================
+  9. NAVIGATION
+================================================================================
+
+  Route         Bengali Label          Access
+  ------------- ---------------------- --------------------------------
+  /             হোম                    Public
+  /login        লগইন                   Public
+  /dashboard    ড্যাশবোর্ড             Protected (JWT required)
+  /donations    চাঁদা সংগ্রহ           Protected — primary mobile page
+  /donors       দাতা ম্যানেজমেন্ট      Protected — CRUD
+  /reports      স্ট্যাটিসটিক্স         Protected — monthly report
+  *             (any other)            Redirect to /
+
+  NAVBAR BEHAVIOUR:
+  - Sticky at top (z-index 40)
+  - Logo left: "ম" green circle + "ময়দানে মুহাম্মাদ" (hidden on small screens)
+  - Navigation links centre (hidden on mobile, shown as hamburger)
+  - Right side: logged-in user name + logout icon
+  - Active route: green background, bold text
+  - Mobile: hamburger opens full-width dropdown menu with all routes
+  - Each mobile menu item has icon + Bengali label
+
+================================================================================
+  10. DOCKER & DEPLOYMENT
+================================================================================
+
+  -----------------------------------------------------------------------
+  10.1  SERVICES (docker-compose.yml)
+  -----------------------------------------------------------------------
+
+  masik_db
+    Image:   mongo:7
+    Role:    MongoDB database
+    Volume:  ./dbdata:/data/db
+    Network: mymentech (internal only — NOT exposed publicly)
+
+  masik_backend
+    Build:   ./backend (node:20-alpine)
+    Role:    Express + Apollo GraphQL server on port 5000
+    Depends: masik_db (wait for healthy)
+    Env:     ./backend/.env
+    Network: mymentech
+
+  masik_frontend
+    Build:   ./frontend (multi-stage: node build → nginx serve)
+    Role:    Serves React production build on port 80
+    Network: mymentech
+
+  masik_nginx
+    Image:   nginx:alpine
+    Role:    Reverse proxy
+    Port:    80:80 (external)
+    Volumes: ./nginx/default.conf
+    Depends: masik_backend, masik_frontend
+    Network: mymentech
+
+  -----------------------------------------------------------------------
+  10.2  NGINX ROUTING  (nginx/default.conf)
+  -----------------------------------------------------------------------
+
+  server {
+      listen 80;
+      server_name subscription.mymentech.com;
+
+      # React SPA — all routes serve index.html
+      location / {
+          proxy_pass http://masik_frontend:80;
+      }
+
+      # GraphQL API — isolated for web and Android app
+      location /graphql {
+          proxy_pass http://masik_backend:5000;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+      }
+  }
+
+  -----------------------------------------------------------------------
+  10.3  ENVIRONMENT VARIABLES  (backend/.env)
+  -----------------------------------------------------------------------
+
+  PORT=5000
+  MONGO_URI=mongodb://masik_db:27017/masik_db
+  JWT_SECRET=change_this_to_a_strong_random_secret_in_production
+  JWT_EXPIRES_IN=7d
+  NODE_ENV=production
+  FRONTEND_URL=http://subscription.mymentech.com
+
+  -----------------------------------------------------------------------
+  10.4  DATA MIGRATION
+  -----------------------------------------------------------------------
+
+  A seed script at backend/src/scripts/seed.js must:
+  1. Read the masik_db_init.sql backup file
+  2. Import all donors into MongoDB donors collection
+  3. Import all payments into MongoDB payments collection
+  4. Import all users into MongoDB users collection
+     (passwords are already bcrypt hashed — keep them as-is)
+  5. Set due_from = null for all existing donors by default
+
+  Run once on first deploy:
+    docker exec masik_backend node src/scripts/seed.js
+
+  -----------------------------------------------------------------------
+  10.5  DOCKERFILES
+  -----------------------------------------------------------------------
+
+  backend/Dockerfile:
+    FROM node:20-alpine
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm ci --omit=dev
+    COPY src/ ./src/
+    COPY .env ./
+    EXPOSE 5000
+    CMD ["node", "src/app.js"]
+
+  frontend/Dockerfile:
+    FROM node:20-alpine AS build
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm ci
+    COPY . .
+    RUN npm run build
+
+    FROM nginx:alpine
+    COPY --from=build /app/dist /usr/share/nginx/html
+    COPY nginx.conf /etc/nginx/conf.d/default.conf
+    EXPOSE 80
+
+================================================================================
+  11. MONTHLY CRON JOB
+================================================================================
+
+  File: backend/src/jobs/recalcDues.js
+
+  Schedule: 1 0 1 * *  (00:01 on the 1st of every month)
+
+  What it does:
+  - Fetches all donors from MongoDB
+  - For each donor, inserts a dues record for the current month
+    with amount_due = donor.monthly_amount
+  - Uses upsert to avoid creating duplicate records
+  - Logs: start time, number of donors processed, completion
+  - All errors caught and logged — cron must NOT crash the server
+
+  Example log output:
+    [CRON] 2026-05-01T00:01:00 — Recalculating dues for 2026-05...
+    [CRON] Done. Processed 766 donors.
+
+================================================================================
+  12. DESIGN SYSTEM
+================================================================================
+
+  -----------------------------------------------------------------------
+  12.1  COLOUR PALETTE
+  -----------------------------------------------------------------------
+
+  Token               Hex         Usage
+  ------------------- ----------- -----------------------------------------
+  green-600 (primary) #16a34a     Buttons, active states, stat icons
+  green-700           #15803d     Button hover state
+  green-50            #f0fdf4     Page backgrounds, highlighted rows
+  green-100           #dcfce7     Table header background
+  red-500             #ef4444     Outstanding balance amounts
+  red-600             #dc2626     Delete buttons, error states
+  orange-500          #f97316     Total balance stat card
+  gray-50             #f9fafb     Alternating table row background
+  gray-100            #f3f4f6     Card borders
+  gray-500            #6b7280     Secondary text, metadata
+  gray-900 / black    #111827     Primary body text
+
+  -----------------------------------------------------------------------
+  12.2  TYPOGRAPHY
+  -----------------------------------------------------------------------
+
+  Font:         Hind Siliguri (Google Fonts — required for Bengali)
+  Import URL:   https://fonts.googleapis.com/css2?family=Hind+Siliguri
+                :wght@300;400;500;600;700&display=swap
+
+  Base size:    16px  (text-base)
+  Minimum:      14px  (text-sm)  — never go smaller
+  Headings:     bold, green-800 colour
+  Body:         gray-900
+  Secondary:    gray-500
+  Balance:      red-600, font-bold
+
+  -----------------------------------------------------------------------
+  12.3  COMPONENT STANDARDS
+  -----------------------------------------------------------------------
+
+  Buttons:
+  - Minimum height: 48px (min-h-[48px]) — critical for mobile tapping
+  - Rounded: rounded-lg
+  - Primary: bg-green-600 text-white hover:bg-green-700
+  - Secondary: border border-green-600 text-green-700 hover:bg-green-50
+  - Danger: bg-red-500 text-white hover:bg-red-600
+  - Disabled: opacity-60 cursor-not-allowed
+
+  Input fields:
+  - border border-gray-300 rounded-lg px-3 py-3
+  - Focus: ring-2 ring-green-500 border-transparent
+
+  Cards:
+  - bg-white rounded-xl shadow-sm border border-gray-100 p-4
+
+  Bottom sheets (modals):
+  - Mobile: fixed bottom-0, rounded-t-2xl, slides up
+  - Handle bar: w-10 h-1 bg-gray-300 rounded-full mx-auto (mobile only)
+  - Desktop: sm:max-w-md sm:rounded-2xl centred with backdrop
+
+  Tables:
+  - Header: bg-green-50, text-green-800, font-bold
+  - Rows: border-b border-gray-100, hover:bg-gray-50
+  - Alternating: odd rows white, even rows gray-50
+
+  Toast notifications:
+  - Fixed position: top-16 (below navbar)
+  - bg-green-600 text-white, rounded-xl, shadow-lg
+  - Auto-dismiss after 3 seconds
+
+================================================================================
+  13. EXISTING DATA (MIGRATION)
+================================================================================
+
+  Entity            Count         Notes
+  ----------------- ------------- -------------------------------------------
+  Donors            766 records   All names and addresses are in Bengali
+  Users/Collectors  3 users       Admin: mymentech@gmail.com
+  Payments          Historical    With collector and payment date data
+  Total Outstanding 1,014,587 BDT As of April 2026 backup date
+
+  All donor names, addresses, and notes are in Bengali — preserve exactly.
+  Existing user passwords are already bcrypt hashed — do NOT reset them.
+  Set due_from = null for all existing donors by default.
+
+================================================================================
+  14. TASK BREAKDOWN
+================================================================================
+
+  #   Task                                          Priority    Owner
+  --- --------------------------------------------- ----------- ------------
+  1   MongoDB models: Donor, Payment, User           CRITICAL    Backend
+  2   calculateDues.js — dues bug fix                CRITICAL    Backend
+  3   GraphQL schema (typeDefs + resolvers)           CRITICAL    Backend
+  4   JWT auth middleware + login mutation            CRITICAL    Backend
+  5   Monthly cron job (1st of month 00:01)           CRITICAL    Backend
+  6   Data migration script (SQL to MongoDB)          CRITICAL    Backend
+  7   React app setup (Vite + Tailwind + Apollo)      CRITICAL    Frontend
+  8   Landing page + Login page                       CRITICAL    Frontend
+  9   Donations page — mobile-first layout            CRITICAL    Frontend
+  10  Payment bottom sheet modal                      CRITICAL    Frontend
+  11  Dashboard stat cards                            HIGH        Frontend
+  12  Donors page — full CRUD + due_from field        HIGH        Frontend
+  13  DonorFormModal with amnesty date field          HIGH        Frontend
+  14  Reports page + PDF download                     HIGH        Frontend
+  15  Navbar (responsive, Bengali labels)             HIGH        Frontend
+  16  Docker Compose + Nginx + Dockerfiles            HIGH        DevOps
+  17  Deploy to subscription.mymentech.com            HIGH        DevOps
+  18  GraphQL API readiness for Android app           NORMAL      Backend
+  19  PDF report generation (pdfkit)                  NORMAL      Backend
+
+================================================================================
+  15. IMPORTANT NOTES
+================================================================================
+
+  GIT & VERSION CONTROL
+  - Branch: MERN — never commit to master (Laravel app stays there)
+  - Git identity: Mozammel Haque <mymentech@gmail.com>
+  - Commit messages in English, conventional commits format
+  - Do not push .env files to the repository
+
+  API DESIGN FOR ANDROID APP
+  - All GraphQL operations use JWT Bearer token (no session cookies)
+  - The Android app will use the same /graphql endpoint
+  - Enable CORS for all origins
+  - Keep the GraphQL schema stable after Android development starts
+  - No breaking changes to existing queries/mutations once defined
+
+  BENGALI LANGUAGE — MANDATORY
+  - ALL UI text must remain in Bengali exactly as in existing screenshots
+  - Navigation labels, button text, form labels, error messages — Bengali
+  - Hind Siliguri font is NOT optional — Bengali will not render without it
+  - Do not translate or anglicise any label or message
+
+  SECURITY
+  - Never commit .env files
+  - Change JWT_SECRET to a strong random string before deploying
+  - MongoDB must not be exposed on any public port
+  - All protected resolvers must verify JWT before executing
+
+  MOBILE PERFORMANCE
+  - The Donations page is the most critical — optimise it first
+  - Use React Query for automatic background refetching
+  - Debounce all search inputs (300ms)
+  - Avoid blocking the UI — use skeleton loaders
+  - Test on an actual mobile device before marking done
+
+================================================================================
+  SIGN-OFF
+================================================================================
+
+  This document defines the complete requirements for the Masik Chada MERN
+  rewrite. Developers must follow all specifications exactly. Any proposed
+  deviations must be discussed with the project owner before implementation.
+
+  Project Owner: Mozammel Haque — MymenTech
+  Contact:       mymentech@gmail.com
+  Repository:    github.com/mymentech/masik-chada  (branch: MERN)
+
+================================================================================
+

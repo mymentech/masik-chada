@@ -1,0 +1,28 @@
+{
+  "run_at_utc": "2026-04-11T21:12:56.278564+00:00",
+  "source_file": "u947130940_subscription.sql",
+  "mode": "dry_run_transform",
+  "input_counts": {
+    "users": 3,
+    "donors": 766,
+    "payments": 1690
+  },
+  "output_counts": {
+    "users_transformed": 3,
+    "donors_transformed": 764,
+    "payments_transformed": 1684,
+    "quarantine_total": 8
+  },
+  "quarantine_by_reason": {
+    "invalid_monthly_amount": 2,
+    "orphan_payment_missing_donor": 6
+  },
+  "id_map_counts": {
+    "users": 3,
+    "donors": 764
+  },
+  "notes": [
+    "donors.due_from is set to null because source dump has no due_from column",
+    "payments.due_id is ignored in target payload because target schema does not store it"
+  ]
+}

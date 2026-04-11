@@ -1,0 +1,301 @@
+{
+  "source_file": "u947130940_subscription.sql",
+  "tables": [
+    "cache",
+    "cache_locks",
+    "donors",
+    "dues",
+    "failed_jobs",
+    "job_batches",
+    "jobs",
+    "migrations",
+    "model_has_permissions",
+    "model_has_roles",
+    "password_reset_tokens",
+    "payments",
+    "permissions",
+    "role_has_permissions",
+    "roles",
+    "sessions",
+    "users"
+  ],
+  "table_columns": {
+    "cache": [
+      "key",
+      "value",
+      "expiration"
+    ],
+    "cache_locks": [
+      "key",
+      "owner",
+      "expiration"
+    ],
+    "donors": [
+      "id",
+      "serial_number",
+      "name",
+      "phone",
+      "address",
+      "monthly_amount",
+      "registration_date",
+      "created_at",
+      "updated_at"
+    ],
+    "dues": [
+      "id",
+      "donor_id",
+      "month_year",
+      "amount_due",
+      "paid_amount",
+      "created_at",
+      "updated_at"
+    ],
+    "failed_jobs": [
+      "id",
+      "uuid",
+      "connection",
+      "queue",
+      "payload",
+      "exception",
+      "failed_at"
+    ],
+    "jobs": [
+      "id",
+      "queue",
+      "payload",
+      "attempts",
+      "reserved_at",
+      "available_at",
+      "created_at"
+    ],
+    "job_batches": [
+      "id",
+      "name",
+      "total_jobs",
+      "pending_jobs",
+      "failed_jobs",
+      "failed_job_ids",
+      "options",
+      "cancelled_at",
+      "created_at",
+      "finished_at"
+    ],
+    "migrations": [
+      "id",
+      "migration",
+      "batch"
+    ],
+    "model_has_permissions": [
+      "permission_id",
+      "model_type",
+      "model_id"
+    ],
+    "model_has_roles": [
+      "role_id",
+      "model_type",
+      "model_id"
+    ],
+    "password_reset_tokens": [
+      "email",
+      "token",
+      "created_at"
+    ],
+    "payments": [
+      "id",
+      "donor_id",
+      "collector_id",
+      "due_id",
+      "amount",
+      "payment_date",
+      "created_at",
+      "updated_at"
+    ],
+    "permissions": [
+      "id",
+      "name",
+      "guard_name",
+      "created_at",
+      "updated_at"
+    ],
+    "roles": [
+      "id",
+      "name",
+      "guard_name",
+      "created_at",
+      "updated_at"
+    ],
+    "role_has_permissions": [
+      "permission_id",
+      "role_id"
+    ],
+    "sessions": [
+      "id",
+      "user_id",
+      "ip_address",
+      "user_agent",
+      "payload",
+      "last_activity"
+    ],
+    "users": [
+      "id",
+      "name",
+      "email",
+      "email_verified_at",
+      "password",
+      "remember_token",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "insert_row_counts": {
+    "donors": 766,
+    "dues": 12106,
+    "migrations": 9,
+    "model_has_roles": 3,
+    "password_reset_tokens": 1,
+    "payments": 1690,
+    "roles": 2,
+    "sessions": 15,
+    "users": 3
+  },
+  "findings": {
+    "donors": {
+      "row_count": 766,
+      "unique_serial_count": 766,
+      "duplicate_serials": [],
+      "serial_gaps": [
+        {
+          "start": 14,
+          "end": 14
+        },
+        {
+          "start": 224,
+          "end": 224
+        },
+        {
+          "start": 713,
+          "end": 713
+        }
+      ],
+      "monthly_amount_distribution": {
+        "0.0": 2,
+        "50.0": 15,
+        "100.0": 694,
+        "150.0": 1,
+        "200.0": 52,
+        "500.0": 2
+      },
+      "zero_monthly_amount_examples": [
+        {
+          "id": 384,
+          "serial_number": 386,
+          "name": "সাইফুৃল ইসলাম"
+        },
+        {
+          "id": 751,
+          "serial_number": 754,
+          "name": "Extra"
+        }
+      ],
+      "registration_date_min": "2025-01-01",
+      "registration_date_max": "2026-03-27",
+      "has_due_from_column": false
+    },
+    "users": {
+      "row_count": 3,
+      "duplicate_emails": [],
+      "null_or_empty_emails": 0
+    },
+    "dues": {
+      "row_count": 12106,
+      "null_month_year_count": 0,
+      "null_paid_amount_count": 0,
+      "orphan_donor_refs": 0,
+      "distinct_month_year_count": 16,
+      "month_year_min": "2025-01",
+      "month_year_max": "2026-04",
+      "rows_per_month_year_sample": {
+        "2025-01": 754,
+        "2025-02": 754,
+        "2025-03": 754
+      },
+      "rows_per_donor_distribution_top": [
+        [
+          16,
+          754
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          2,
+          2
+        ]
+      ]
+    },
+    "payments": {
+      "row_count": 1690,
+      "payment_date_min": "2025-01-07",
+      "payment_date_max": "2026-03-28",
+      "orphan_donor_refs": 0,
+      "orphan_collector_refs": 0,
+      "orphan_due_refs_non_null": 0,
+      "null_due_id_count": 1690,
+      "negative_amount_count": 0,
+      "zero_amount_count": 0
+    },
+    "dues_vs_registration_expectation_as_of_2026_04_30": {
+      "expected_total_rows": 12063,
+      "actual_total_rows": 12106,
+      "delta_actual_minus_expected": 43,
+      "donor_mismatch_count": 5,
+      "mismatch_examples": [
+        {
+          "id": 89,
+          "serial_number": 90,
+          "registration_date": "2026-02-05",
+          "expected_rows": 3,
+          "actual_rows": 16,
+          "name": "মুফতি মাকছুদুল ইসলাম"
+        },
+        {
+          "id": 451,
+          "serial_number": 453,
+          "registration_date": "2026-02-05",
+          "expected_rows": 3,
+          "actual_rows": 16,
+          "name": "আমিনুল ইসলাম (মটর)"
+        },
+        {
+          "id": 570,
+          "serial_number": 572,
+          "registration_date": "2025-07-01",
+          "expected_rows": 10,
+          "actual_rows": 16,
+          "name": "আশরাফুল ইসলাম মিলন"
+        },
+        {
+          "id": 703,
+          "serial_number": 705,
+          "registration_date": "2025-06-01",
+          "expected_rows": 11,
+          "actual_rows": 16,
+          "name": "হাবিবুর রহমান - মাছ বেপারী (708,709)"
+        },
+        {
+          "id": 739,
+          "serial_number": 742,
+          "registration_date": "2025-07-01",
+          "expected_rows": 10,
+          "actual_rows": 16,
+          "name": "মোবারক"
+        }
+      ]
+    }
+  }
+}

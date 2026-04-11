@@ -1,0 +1,8 @@
+{"entity": "donors", "legacy_id": 384, "reason": "invalid_monthly_amount", "monthly_amount": 0.0}
+{"entity": "donors", "legacy_id": 751, "reason": "invalid_monthly_amount", "monthly_amount": 0.0}
+{"entity": "payments", "legacy_id": 548, "reason": "orphan_payment_missing_donor", "legacy_donor_id": 384}
+{"entity": "payments", "legacy_id": 1350, "reason": "orphan_payment_missing_donor", "legacy_donor_id": 751}
+{"entity": "payments", "legacy_id": 1351, "reason": "orphan_payment_missing_donor", "legacy_donor_id": 751}
+{"entity": "payments", "legacy_id": 1352, "reason": "orphan_payment_missing_donor", "legacy_donor_id": 751}
+{"entity": "payments", "legacy_id": 1353, "reason": "orphan_payment_missing_donor", "legacy_donor_id": 751}
+{"entity": "payments", "legacy_id": 1596, "reason": "orphan_payment_missing_donor", "legacy_donor_id": 751}

@@ -1,0 +1,22 @@
+'Log files:
+/workspace/mymentech-agency/masik-chada-src/backend/.npm-cache/_logs/2026-04-11T21_09_43_320Z-debug-0.log
+
+# npm resolution error report
+
+While resolving: masik-chada-backend@1.0.0
+Found: @nestjs/apollo@12.2.2
+node_modules/@nestjs/apollo
+  @nestjs/apollo@"13.2.5" from the root project
+
+Could not resolve dependency:
+@nestjs/apollo@"13.2.5" from the root project
+
+Conflicting peer dependency: @apollo/server@5.5.0
+node_modules/@apollo/server
+  peer @apollo/server@"^5.0.0" from @nestjs/apollo@13.2.5
+  node_modules/@nestjs/apollo
+    @nestjs/apollo@"13.2.5" from the root project
+
+Fix the upstream dependency conflict, or retry
+this command with --force or --legacy-peer-deps
+to accept an incorrect (and potentially broken) dependency resolution.

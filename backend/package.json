@@ -1,0 +1,44 @@
+{
+  "name": "masik-chada-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "start:dev": "ts-node src/main.ts",
+    "jobs:monthly-snapshot": "node dist/jobs/run-monthly-snapshot-job.js",
+    "jobs:monthly-snapshot:dev": "ts-node src/jobs/run-monthly-snapshot-job.ts",
+    "migration:sync-donor-serial-counter": "node dist/migrations/sync-donor-serial-counter.js",
+    "migration:sync-donor-serial-counter:dev": "ts-node src/migrations/sync-donor-serial-counter.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.5.0",
+    "@nestjs/apollo": "^13.2.5",
+    "@nestjs/common": "^11.1.18",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.18",
+    "@nestjs/graphql": "^13.2.5",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/mongoose": "^11.0.4",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.1.18",
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^3.6.0",
+    "graphql": "^16.9.0",
+    "mongoose": "^8.8.3",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.1",
+    "@types/passport-jwt": "^4.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

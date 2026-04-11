@@ -1,0 +1,239 @@
+"""
+Masik Chada GraphQL Contract v1
+Contract status: stable v1 (additive evolution only after Android integration starts)
+"""
+
+scalar Date
+scalar DateTime
+
+enum Role {
+  ADMIN
+  COLLECTOR
+}
+
+enum PaymentMethod {
+  CASH
+  BANK
+  MOBILE_BANKING
+  OTHER
+}
+
+enum DonorSortField {
+  SERIAL_NUMBER
+  FULL_NAME
+  CREATED_AT
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+enum DonorStatus {
+  ACTIVE
+  INACTIVE
+}
+
+type Query {
+  """
+  Authenticated user profile from JWT context.
+  """
+  viewer: Viewer!
+
+  """
+  Cursor-based donor query for mobile collection flow and admin management.
+  """
+  donors(input: DonorsQueryInput!): DonorConnection!
+
+  """
+  Fetch a single donor by opaque ID.
+  """
+  donor(id: ID!): Donor
+
+  """
+  Dashboard totals for the current month when month is omitted.
+  """
+  dashboardSummary(month: String): DashboardSummary!
+
+  """
+  Monthly report with collector breakdown.
+  month format: YYYY-MM
+  """
+  monthlyReport(month: String!): MonthlyReport!
+}
+
+type Mutation {
+  """
+  Public mutation. Does not require Authorization header.
+  """
+  login(input: LoginInput!): LoginPayload!
+
+  createDonor(input: CreateDonorInput!): CreateDonorPayload!
+  updateDonor(input: UpdateDonorInput!): UpdateDonorPayload!
+  deleteDonor(input: DeleteDonorInput!): DeleteDonorPayload!
+
+  """
+  Records payment and returns refreshed balance in same response.
+  """
+  recordPayment(input: RecordPaymentInput!): RecordPaymentPayload!
+}
+
+type Viewer {
+  id: ID!
+  username: String!
+  displayName: String!
+  role: Role!
+}
+
+type DonorConnection {
+  edges: [DonorEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type DonorEdge {
+  cursor: String!
+  node: Donor!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Donor {
+  id: ID!
+  serialNumber: Int!
+  fullName: String!
+  fatherName: String
+  phone: String
+  address: String
+  registrationDate: Date!
+  dueFrom: Date
+  monthlyAmount: Int!
+  status: DonorStatus!
+  notes: String
+  totalDue: Int!
+  totalPaid: Int!
+  outstandingBalance: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Payment {
+  id: ID!
+  donorId: ID!
+  amount: Int!
+  paymentDate: Date!
+  method: PaymentMethod!
+  note: String
+  recordedBy: Viewer!
+  createdAt: DateTime!
+}
+
+type DashboardSummary {
+  month: String!
+  totalCollected: Int!
+  totalOutstanding: Int!
+  activeDonorCount: Int!
+  paymentCount: Int!
+}
+
+type MonthlyReport {
+  month: String!
+  totalCollected: Int!
+  totalOutstanding: Int!
+  paymentCount: Int!
+  donorCount: Int!
+  collectorTotals: [CollectorTotal!]!
+  generatedAt: DateTime!
+}
+
+type CollectorTotal {
+  collector: Viewer!
+  collectedAmount: Int!
+  paymentCount: Int!
+}
+
+input DonorsQueryInput {
+  first: Int = 20
+  after: String
+  search: String
+  address: String
+  status: DonorStatus = ACTIVE
+  sort: DonorSortInput = { field: SERIAL_NUMBER, direction: ASC }
+}
+
+input DonorSortInput {
+  field: DonorSortField!
+  direction: SortDirection!
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+type LoginPayload {
+  accessToken: String!
+  tokenType: String!
+  expiresInSeconds: Int!
+  viewer: Viewer!
+}
+
+input CreateDonorInput {
+  fullName: String!
+  fatherName: String
+  phone: String
+  address: String
+  registrationDate: Date!
+  dueFrom: Date
+  monthlyAmount: Int!
+  notes: String
+}
+
+type CreateDonorPayload {
+  donor: Donor!
+}
+
+input UpdateDonorInput {
+  donorId: ID!
+  fullName: String
+  fatherName: String
+  phone: String
+  address: String
+  registrationDate: Date
+  dueFrom: Date
+  monthlyAmount: Int
+  status: DonorStatus
+  notes: String
+}
+
+type UpdateDonorPayload {
+  donor: Donor!
+}
+
+input DeleteDonorInput {
+  donorId: ID!
+}
+
+type DeleteDonorPayload {
+  donorId: ID!
+  deleted: Boolean!
+}
+
+input RecordPaymentInput {
+  donorId: ID!
+  amount: Int!
+  paymentDate: Date!
+  method: PaymentMethod = CASH
+  note: String
+}
+
+type RecordPaymentPayload {
+  payment: Payment!
+  donor: Donor!
+  dashboardSummary: DashboardSummary!
+}

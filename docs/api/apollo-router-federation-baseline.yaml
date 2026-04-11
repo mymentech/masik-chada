@@ -1,0 +1,59 @@
+version: 1
+
+supergraph:
+  listen: 0.0.0.0:4000
+
+headers:
+  all:
+    request:
+      - propagate:
+          named: authorization
+      - insert:
+          name: x-request-id
+          from_context: request_id
+
+limits:
+  parser_max_tokens: 15000
+  parser_max_recursion: 500
+  http_max_request_bytes: 1048576
+
+telemetry:
+  instrumentation:
+    events:
+      supergraph:
+        request:
+          level: info
+      router:
+        request:
+          level: info
+
+include_subgraph_errors:
+  all: false
+
+authorization:
+  directives:
+    enabled: false
+
+cors:
+  origins:
+    - https://subscription.mymentech.com
+  methods:
+    - GET
+    - POST
+    - OPTIONS
+  headers:
+    - authorization
+    - content-type
+
+traffic_shaping:
+  all:
+    timeout: 5s
+    global_rate_limit:
+      capacity: 500
+      interval: 1s
+
+override_subgraph_url:
+  identity: http://identity-subgraph:4001/graphql
+  donors: http://donors-subgraph:4002/graphql
+  payments: http://payments-subgraph:4003/graphql
+  reporting: http://reporting-subgraph:4004/graphql

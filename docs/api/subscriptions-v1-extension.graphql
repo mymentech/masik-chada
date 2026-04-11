@@ -1,0 +1,41 @@
+"""
+Optional real-time extension for v1+.
+This is additive and can be introduced without breaking existing clients.
+"""
+
+type Subscription {
+  """
+  Emits when a payment is recorded.
+  Server should enforce auth and role checks from context.
+  """
+  paymentRecorded(filter: PaymentRecordedFilterInput): PaymentRecordedEvent!
+
+  """
+  Emits balance updates for a donor after payment write or donor update.
+  """
+  donorBalanceUpdated(donorId: ID!): DonorBalanceUpdatedEvent!
+}
+
+input PaymentRecordedFilterInput {
+  donorId: ID
+  collectorId: ID
+}
+
+type PaymentRecordedEvent {
+  payment: Payment!
+  donor: Donor!
+  dashboardSummary: DashboardSummary!
+  occurredAt: DateTime!
+}
+
+type DonorBalanceUpdatedEvent {
+  donor: Donor!
+  reason: DonorBalanceUpdateReason!
+  occurredAt: DateTime!
+}
+
+enum DonorBalanceUpdateReason {
+  PAYMENT_RECORDED
+  DONOR_UPDATED
+  MANUAL_RECALCULATION
+}
