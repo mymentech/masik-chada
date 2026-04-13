@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { DonorsService } from '../donors/donors.service';
 import { Payment, PaymentDocument } from '../payments/schemas/payment.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
@@ -19,7 +19,10 @@ export class ReportsService {
     const { start, end } = monthBounds(month);
 
     const paymentRows = await this.paymentModel
-      .aggregate<{ totals: { collected: number }[]; byCollector: { _id: string; total: number }[] }>([
+      .aggregate<{
+        totals: { collected: number }[];
+        byCollector: { _id: Types.ObjectId | string | null; total: number }[];
+      }>([
         { $match: { payment_date: { $gte: start, $lte: end } } },
         {
           $facet: {
@@ -31,8 +34,13 @@ export class ReportsService {
       .exec();
 
     const byCollectorRows = paymentRows[0]?.byCollector || [];
-    const collectorIds = byCollectorRows.map((row) => row._id);
-    const users = await this.userModel.find({ _id: { $in: collectorIds } }).lean().exec();
+    const collectorIds = byCollectorRows
+      .map((row) => row._id)
+      .filter((collectorId): collectorId is Types.ObjectId | string => collectorId !== null);
+    const users =
+      collectorIds.length > 0
+        ? await this.userModel.find({ _id: { $in: collectorIds } }).lean().exec()
+        : [];
     const names = new Map(users.map((user) => [String(user._id), user.name]));
 
     const totalBalance = Number((await this.donorsService.totalBalance(end)).toFixed(2));

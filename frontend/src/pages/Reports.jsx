@@ -25,22 +25,46 @@ export default function Reports() {
   });
 
   const report = data?.monthlyReport;
+  const canExport = Boolean(report) && !loading;
+
+  function exportPdf() {
+    if (!canExport) {
+      return;
+    }
+
+    window.print();
+  }
 
   return (
     <section className="container page-shell">
-      <h1>মাসিক রিপোর্ট</h1>
+      <div className="report-toolbar">
+        <div>
+          <h1>মাসিক রিপোর্ট</h1>
 
-      <label htmlFor="report-month" className="field-label">মাস নির্বাচন করুন</label>
-      <input
-        id="report-month"
-        className="sheet-input report-month-input"
-        type="month"
-        value={month}
-        onChange={(event) => setMonth(event.target.value)}
-      />
+          <label htmlFor="report-month" className="field-label">মাস নির্বাচন করুন</label>
+          <input
+            id="report-month"
+            className="sheet-input report-month-input"
+            type="month"
+            value={month}
+            onChange={(event) => setMonth(event.target.value)}
+          />
+        </div>
+
+        <button
+          type="button"
+          className="primary-btn tap-btn report-export-btn"
+          onClick={exportPdf}
+          disabled={!canExport}
+          data-testid="reports-export-pdf"
+        >
+          PDF এক্সপোর্ট
+        </button>
+      </div>
 
       {loading && !report ? <p>রিপোর্ট লোড হচ্ছে...</p> : null}
       {error ? <p className="feedback-error">রিপোর্ট লোড করা যায়নি।</p> : null}
+      {!loading && !error && !report ? <p>এই মাসের জন্য কোনো রিপোর্ট পাওয়া যায়নি।</p> : null}
 
       {report ? (
         <>

@@ -1,0 +1,330 @@
+{
+  "users": [
+    {
+      "legacy_id": 1,
+      "source": {
+        "name": "মো. মোজাম্মেল হক",
+        "email": "mymentech@gmail.com",
+        "password": "$2y$12$s6LXcimfCzuJajyRBDKwUe.6OEZ3qu9PQE4fB4R3vaqLOPCfv2SOe"
+      },
+      "transformed": {
+        "_id": "d8b81775f90c2c0a0fa929a5",
+        "legacy_id": 1,
+        "name": "মো. মোজাম্মেল হক",
+        "email": "mymentech@gmail.com",
+        "password": "$2y$12$s6LXcimfCzuJajyRBDKwUe.6OEZ3qu9PQE4fB4R3vaqLOPCfv2SOe",
+        "created_at": "2026-01-01T19:24:41",
+        "upsert_key": {
+          "email": "mymentech@gmail.com"
+        }
+      }
+    },
+    {
+      "legacy_id": 2,
+      "source": {
+        "name": "মো. নূরুল্লাহ",
+        "email": "hridoynurullah@gmail.com",
+        "password": "$2y$12$s6LXcimfCzuJajyRBDKwUe.6OEZ3qu9PQE4fB4R3vaqLOPCfv2SOe"
+      },
+      "transformed": {
+        "_id": "3969c12ecf868e8706f20367",
+        "legacy_id": 2,
+        "name": "মো. নূরুল্লাহ",
+        "email": "hridoynurullah@gmail.com",
+        "password": "$2y$12$s6LXcimfCzuJajyRBDKwUe.6OEZ3qu9PQE4fB4R3vaqLOPCfv2SOe",
+        "created_at": "2026-01-01T19:24:41",
+        "upsert_key": {
+          "email": "hridoynurullah@gmail.com"
+        }
+      }
+    },
+    {
+      "legacy_id": 3,
+      "source": {
+        "name": "মো. মতিউর রহমান",
+        "email": "motiurfood19@gmail.com",
+        "password": "$2y$12$6TXtPLRosCPBAoIcP/ww2uUC8ml7fioIE.J.rJYasviU89.OEQ8ZO"
+      },
+      "transformed": {
+        "_id": "cd95baa43571f8cad52934ca",
+        "legacy_id": 3,
+        "name": "মো. মতিউর রহমান",
+        "email": "motiurfood19@gmail.com",
+        "password": "$2y$12$6TXtPLRosCPBAoIcP/ww2uUC8ml7fioIE.J.rJYasviU89.OEQ8ZO",
+        "created_at": "2026-02-05T09:19:16",
+        "upsert_key": {
+          "email": "motiurfood19@gmail.com"
+        }
+      }
+    }
+  ],
+  "donors": [
+    {
+      "legacy_id": 1,
+      "source": {
+        "serial_number": 1,
+        "name": "মো. মোবারক হোসাইন",
+        "address": "ঢাকিরকান্দা",
+        "monthly_amount": 200.0,
+        "registration_date": "2025-01-01"
+      },
+      "transformed": {
+        "_id": "c601194b83e5c8657a9eb67b",
+        "legacy_id": 1,
+        "serial_number": 1,
+        "name": "মো. মোবারক হোসাইন",
+        "phone": "+880",
+        "address": "ঢাকিরকান্দা",
+        "monthly_amount": 200.0,
+        "registration_date": "2025-01-01T00:00:00",
+        "due_from": null,
+        "created_at": "2026-01-01T19:29:27",
+        "updated_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "serial_number": 1
+        }
+      }
+    },
+    {
+      "legacy_id": 2,
+      "source": {
+        "serial_number": 2,
+        "name": "মতিউর রহমান- csd",
+        "address": "ময়দানে মুহাম্মাদ",
+        "monthly_amount": 200.0,
+        "registration_date": "2025-01-01"
+      },
+      "transformed": {
+        "_id": "c1fc6b309658cc834f705908",
+        "legacy_id": 2,
+        "serial_number": 2,
+        "name": "মতিউর রহমান- csd",
+        "phone": "+880172865344",
+        "address": "ময়দানে মুহাম্মাদ",
+        "monthly_amount": 200.0,
+        "registration_date": "2025-01-01T00:00:00",
+        "due_from": null,
+        "created_at": "2026-01-01T19:29:27",
+        "updated_at": "2026-01-02T13:19:18",
+        "upsert_key": {
+          "serial_number": 2
+        }
+      }
+    },
+    {
+      "legacy_id": 3,
+      "source": {
+        "serial_number": 3,
+        "name": "মোশারফ হোসাইন",
+        "address": "মুক্তাগাছা",
+        "monthly_amount": 100.0,
+        "registration_date": "2025-01-01"
+      },
+      "transformed": {
+        "_id": "6d38c4df232004a117953a4f",
+        "legacy_id": 3,
+        "serial_number": 3,
+        "name": "মোশারফ হোসাইন",
+        "phone": "+880",
+        "address": "মুক্তাগাছা",
+        "monthly_amount": 100.0,
+        "registration_date": "2025-01-01T00:00:00",
+        "due_from": null,
+        "created_at": "2026-01-01T19:29:27",
+        "updated_at": "2026-01-01T21:23:54",
+        "upsert_key": {
+          "serial_number": 3
+        }
+      }
+    },
+    {
+      "legacy_id": 4,
+      "source": {
+        "serial_number": 4,
+        "name": "ক্বারী আ: সামাদ-বাঘাডোবা",
+        "address": "ঢাকিরকান্দা",
+        "monthly_amount": 100.0,
+        "registration_date": "2025-01-01"
+      },
+      "transformed": {
+        "_id": "37383447ed5700ab6c04a633",
+        "legacy_id": 4,
+        "serial_number": 4,
+        "name": "ক্বারী আ: সামাদ-বাঘাডোবা",
+        "phone": "+880",
+        "address": "ঢাকিরকান্দা",
+        "monthly_amount": 100.0,
+        "registration_date": "2025-01-01T00:00:00",
+        "due_from": null,
+        "created_at": "2026-01-01T19:29:27",
+        "updated_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "serial_number": 4
+        }
+      }
+    },
+    {
+      "legacy_id": 5,
+      "source": {
+        "serial_number": 5,
+        "name": "আইয়ুব আলী-ভবানীপুর",
+        "address": "জয়বাংলা",
+        "monthly_amount": 100.0,
+        "registration_date": "2025-01-01"
+      },
+      "transformed": {
+        "_id": "46e78e112b1f677e1853259e",
+        "legacy_id": 5,
+        "serial_number": 5,
+        "name": "আইয়ুব আলী-ভবানীপুর",
+        "phone": "+880",
+        "address": "জয়বাংলা",
+        "monthly_amount": 100.0,
+        "registration_date": "2025-01-01T00:00:00",
+        "due_from": null,
+        "created_at": "2026-01-01T19:29:27",
+        "updated_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "serial_number": 5
+        }
+      }
+    }
+  ],
+  "payments": [
+    {
+      "legacy_id": 1,
+      "source": {
+        "donor_id": 1,
+        "collector_id": 1,
+        "amount": 200.0,
+        "payment_date": "2025-01-07"
+      },
+      "transformed": {
+        "_id": "33ccabc3b74d0e970a7db039",
+        "legacy_id": 1,
+        "donor_id": "c601194b83e5c8657a9eb67b",
+        "collector_id": "d8b81775f90c2c0a0fa929a5",
+        "amount": 200.0,
+        "payment_date": "2025-01-07T00:00:00",
+        "created_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "legacy_payment_id": 1,
+          "fallback": {
+            "donor_id": "c601194b83e5c8657a9eb67b",
+            "collector_id": "d8b81775f90c2c0a0fa929a5",
+            "amount": 200.0,
+            "payment_date": "2025-01-07T00:00:00"
+          }
+        }
+      }
+    },
+    {
+      "legacy_id": 2,
+      "source": {
+        "donor_id": 1,
+        "collector_id": 1,
+        "amount": 200.0,
+        "payment_date": "2025-04-07"
+      },
+      "transformed": {
+        "_id": "e696772f34dd8a2caf37a833",
+        "legacy_id": 2,
+        "donor_id": "c601194b83e5c8657a9eb67b",
+        "collector_id": "d8b81775f90c2c0a0fa929a5",
+        "amount": 200.0,
+        "payment_date": "2025-04-07T00:00:00",
+        "created_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "legacy_payment_id": 2,
+          "fallback": {
+            "donor_id": "c601194b83e5c8657a9eb67b",
+            "collector_id": "d8b81775f90c2c0a0fa929a5",
+            "amount": 200.0,
+            "payment_date": "2025-04-07T00:00:00"
+          }
+        }
+      }
+    },
+    {
+      "legacy_id": 3,
+      "source": {
+        "donor_id": 1,
+        "collector_id": 1,
+        "amount": 200.0,
+        "payment_date": "2025-06-07"
+      },
+      "transformed": {
+        "_id": "1a4a7bb127df3e0c66ecb2be",
+        "legacy_id": 3,
+        "donor_id": "c601194b83e5c8657a9eb67b",
+        "collector_id": "d8b81775f90c2c0a0fa929a5",
+        "amount": 200.0,
+        "payment_date": "2025-06-07T00:00:00",
+        "created_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "legacy_payment_id": 3,
+          "fallback": {
+            "donor_id": "c601194b83e5c8657a9eb67b",
+            "collector_id": "d8b81775f90c2c0a0fa929a5",
+            "amount": 200.0,
+            "payment_date": "2025-06-07T00:00:00"
+          }
+        }
+      }
+    },
+    {
+      "legacy_id": 4,
+      "source": {
+        "donor_id": 1,
+        "collector_id": 1,
+        "amount": 200.0,
+        "payment_date": "2025-07-07"
+      },
+      "transformed": {
+        "_id": "e263069b7c490a819ae25d7b",
+        "legacy_id": 4,
+        "donor_id": "c601194b83e5c8657a9eb67b",
+        "collector_id": "d8b81775f90c2c0a0fa929a5",
+        "amount": 200.0,
+        "payment_date": "2025-07-07T00:00:00",
+        "created_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "legacy_payment_id": 4,
+          "fallback": {
+            "donor_id": "c601194b83e5c8657a9eb67b",
+            "collector_id": "d8b81775f90c2c0a0fa929a5",
+            "amount": 200.0,
+            "payment_date": "2025-07-07T00:00:00"
+          }
+        }
+      }
+    },
+    {
+      "legacy_id": 5,
+      "source": {
+        "donor_id": 1,
+        "collector_id": 1,
+        "amount": 200.0,
+        "payment_date": "2025-08-07"
+      },
+      "transformed": {
+        "_id": "92535424e35782bcf2cf9330",
+        "legacy_id": 5,
+        "donor_id": "c601194b83e5c8657a9eb67b",
+        "collector_id": "d8b81775f90c2c0a0fa929a5",
+        "amount": 200.0,
+        "payment_date": "2025-08-07T00:00:00",
+        "created_at": "2026-01-01T20:13:48",
+        "upsert_key": {
+          "legacy_payment_id": 5,
+          "fallback": {
+            "donor_id": "c601194b83e5c8657a9eb67b",
+            "collector_id": "d8b81775f90c2c0a0fa929a5",
+            "amount": 200.0,
+            "payment_date": "2025-08-07T00:00:00"
+          }
+        }
+      }
+    }
+  ]
+}

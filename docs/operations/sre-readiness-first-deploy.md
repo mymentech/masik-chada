@@ -7,7 +7,8 @@ Define operational readiness for first production deployment on single-host Dock
 ## Deployment Assumptions
 
 - Single host with Docker Compose.
-- Public entrypoint is Nginx.
+- Public entrypoint is an external TLS terminator in front of Nginx.
+- Compose Nginx serves internal HTTP only and must receive `X-Forwarded-Proto: https` from the TLS terminator.
 - `/` routes to frontend; `/graphql` routes to backend.
 - MongoDB remains private on the internal Compose network.
 - First deploy includes one-time SQL-to-Mongo seed/import path.
@@ -64,10 +65,10 @@ Readiness criteria:
   - `/graphql` -> backend
 
 Suggested check:
-- `curl -fsS http://localhost/graphql -H 'Content-Type: application/json' -d '{"query":"{__typename}"}'`
+- `curl -fsS http://localhost/graphql -H 'Host: subscription.mymentech.com' -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' -d '{"query":"{__typename}"}'`
 
 Operational gate:
-- Nginx is the final readiness gate before DNS/traffic cutover.
+- The TLS terminator plus Nginx together are the final readiness gate before DNS/traffic cutover.
 
 ## Runtime Validation Checklist
 
@@ -85,7 +86,7 @@ Operational gate:
 2. Start backend with readiness endpoint enabled; verify `/health/live` then `/health/ready`.
 3. Run seed/import task once; capture summary (inserted, skipped, failed rows).
 4. Start frontend and Nginx.
-5. Validate routing via localhost and host header for `subscription.mymentech.com`.
+5. Validate routing via the TLS endpoint (`https://subscription.mymentech.com`) and via localhost with `Host: subscription.mymentech.com` plus `X-Forwarded-Proto: https`.
 6. Execute GraphQL smoke tests:
    - login mutation (known admin account)
    - donor query
@@ -146,6 +147,8 @@ Mitigations:
   - Mitigation: readiness-gated startup and smoke checks before cutover.
 - Misrouted Nginx paths.
   - Mitigation: explicit route smoke tests for `/` and `/graphql` before opening traffic.
+- TLS terminator forwards requests without HTTPS context.
+  - Mitigation: require `X-Forwarded-Proto: https` pass-through and verify secure-origin behavior during cutover checks.
 - Duplicate cron registration after restart.
   - Mitigation: startup log assertion for single scheduler registration.
 - Data drift after import retries.

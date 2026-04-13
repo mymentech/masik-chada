@@ -67,4 +67,53 @@ describe('DonorsService.nextSerialNumber', () => {
       { new: true },
     );
   });
+
+  it('does not rewind when counter is already ahead of donor max', async () => {
+    const { DonorsService } = await import('./donors.service');
+
+    const maxDonorExec = vi.fn().mockResolvedValue({ serial_number: 80 });
+    const donorModel = {
+      findOne: vi.fn().mockReturnValue({
+        sort: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            lean: vi.fn().mockReturnValue({
+              exec: maxDonorExec,
+            }),
+          }),
+        }),
+      }),
+    };
+
+    const initExec = vi.fn().mockResolvedValue({ key: 'donor_serial', value: 120 });
+    const incExec = vi.fn().mockResolvedValue({ key: 'donor_serial', value: 121 });
+    const counterFindOneAndUpdate = vi
+      .fn()
+      .mockReturnValueOnce({
+        lean: vi.fn().mockReturnValue({
+          exec: initExec,
+        }),
+      })
+      .mockReturnValueOnce({
+        lean: vi.fn().mockReturnValue({
+          exec: incExec,
+        }),
+      });
+    const counterModel = {
+      findOneAndUpdate: counterFindOneAndUpdate,
+    };
+
+    const service = new DonorsService(donorModel as never, {} as never, counterModel as never);
+    const serial = await (service as any).nextSerialNumber();
+
+    expect(serial).toBe(121);
+    expect(counterFindOneAndUpdate).toHaveBeenNthCalledWith(
+      1,
+      { key: 'donor_serial' },
+      {
+        $max: { value: 80 },
+        $setOnInsert: { key: 'donor_serial' },
+      },
+      { upsert: true, new: true },
+    );
+  });
 });

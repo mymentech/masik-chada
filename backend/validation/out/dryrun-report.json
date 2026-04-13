@@ -1,6 +1,6 @@
 {
-  "run_at_utc": "2026-04-11T21:12:56.278564+00:00",
-  "source_file": "u947130940_subscription.sql",
+  "run_at_utc": "2026-04-12T20:07:11.324135+00:00",
+  "source_file": "/workspace/mymentech-agency/masik-chada-src/u947130940_subscription.sql",
   "mode": "dry_run_transform",
   "input_counts": {
     "users": 3,
@@ -17,9 +17,44 @@
     "invalid_monthly_amount": 2,
     "orphan_payment_missing_donor": 6
   },
+  "parity": {
+    "users": {
+      "source": 3,
+      "transformed": 3,
+      "quarantined": 0,
+      "balanced": true
+    },
+    "donors": {
+      "source": 766,
+      "transformed": 764,
+      "quarantined": 2,
+      "balanced": true
+    },
+    "payments": {
+      "source": 1690,
+      "transformed": 1684,
+      "quarantined": 6,
+      "balanced": true
+    }
+  },
   "id_map_counts": {
     "users": 3,
     "donors": 764
+  },
+  "bengali_fidelity": {
+    "checked_fields_total": 1463,
+    "failed_fields_total": 0,
+    "status": "pass"
+  },
+  "artifact_paths": {
+    "users_transformed": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/users.transformed.jsonl",
+    "donors_transformed": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/donors.transformed.jsonl",
+    "payments_transformed": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/payments.transformed.jsonl",
+    "quarantine": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/quarantine.jsonl",
+    "id_maps": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/id-maps.json",
+    "golden_records": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/golden-records.json",
+    "bengali_fidelity_report": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/bengali-fidelity-report.json",
+    "dryrun_report": "/workspace/mymentech-agency/masik-chada-src/backend/validation/out/dryrun-report.json"
   },
   "notes": [
     "donors.due_from is set to null because source dump has no due_from column",

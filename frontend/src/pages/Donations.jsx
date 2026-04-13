@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { RECORD_PAYMENT_MUTATION } from '../graphql/mutations';
-import { DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
 
 function formatMoney(value) {
   return new Intl.NumberFormat('bn-BD', {
@@ -26,28 +26,49 @@ function toGraphqlDate(value) {
   return new Date(`${value}T00:00:00.000Z`).toISOString();
 }
 
+function useDebouncedValue(value, delayMs = 300) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebounced(value);
+    }, delayMs);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [value, delayMs]);
+
+  return debounced;
+}
+
 export default function Donations() {
   const [search, setSearch] = useState('');
+  const [address, setAddress] = useState('');
   const [selectedDonorId, setSelectedDonorId] = useState(null);
   const [amount, setAmount] = useState('');
   const [paymentDate, setPaymentDate] = useState(todayIsoDate());
   const [notice, setNotice] = useState({ type: '', text: '' });
 
-  const searchText = search.trim();
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
   const variables = useMemo(
     () => ({
-      search: searchText || undefined,
-      address: undefined
+      search: debouncedSearch || undefined,
+      address: address || undefined
     }),
-    [searchText]
+    [debouncedSearch, address]
   );
 
   const { data, loading, error } = useQuery(DONORS_QUERY, {
     variables,
     fetchPolicy: 'cache-and-network'
   });
+  const { data: addressesData } = useQuery(ADDRESSES_QUERY, {
+    fetchPolicy: 'cache-first'
+  });
 
   const donors = data?.donors || [];
+  const addresses = addressesData?.addresses || [];
   const selectedDonor = donors.find((donor) => donor.id === selectedDonorId) || null;
 
   const [recordPayment, paymentState] = useMutation(RECORD_PAYMENT_MUTATION);
@@ -118,18 +139,43 @@ export default function Donations() {
     <section className="container donations-page">
       <div className="page-shell">
         <h1>দান সংগ্রহ</h1>
-        <p className="hint-text">মোবাইল কালেকশনের জন্য ডোনার সিলেক্ট করে দ্রুত পেমেন্ট যোগ করুন।</p>
+        <p className="hint-text">
+          মোবাইল কালেকশনের জন্য ডোনার সিলেক্ট করে দ্রুত পেমেন্ট যোগ করুন।
+          সার্চ ফলাফল ৩০০ms ডিবাউন্সে আপডেট হয়।
+        </p>
 
-        <label htmlFor="donor-search" className="field-label">ডোনার সার্চ</label>
-        <input
-          id="donor-search"
-          className="search-input"
-          type="search"
-          placeholder="নাম বা সিরিয়াল নম্বর লিখুন"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          data-testid="donations-search-input"
-        />
+        <div className="filter-row">
+          <div className="filter-field">
+            <label htmlFor="donor-search" className="field-label">ডোনার সার্চ</label>
+            <input
+              id="donor-search"
+              className="search-input"
+              type="search"
+              placeholder="নাম বা সিরিয়াল নম্বর লিখুন"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              data-testid="donations-search-input"
+            />
+          </div>
+
+          <div className="filter-field">
+            <label htmlFor="donor-address" className="field-label">এলাকা ফিল্টার</label>
+            <select
+              id="donor-address"
+              className="sheet-input"
+              value={address}
+              onChange={(event) => setAddress(event.target.value)}
+              data-testid="donations-address-filter"
+            >
+              <option value="">সব এলাকা</option>
+              {addresses.map((row) => (
+                <option key={row} value={row}>
+                  {row}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {notice.text ? (
           <p

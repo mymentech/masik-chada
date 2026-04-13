@@ -7,6 +7,7 @@ import { MonthlySnapshotService } from './monthly-snapshot.service';
 export class MonthlySnapshotScheduler implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(MonthlySnapshotScheduler.name);
   private timer: NodeJS.Timeout | null = null;
+  private enabled = false;
 
   constructor(
     private readonly config: ConfigService,
@@ -14,8 +15,8 @@ export class MonthlySnapshotScheduler implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit(): void {
-    const enabled = getBoolean(this.config, 'MONTHLY_SNAPSHOT_SCHEDULER_ENABLED', true);
-    if (!enabled) {
+    this.enabled = getBoolean(this.config, 'MONTHLY_SNAPSHOT_SCHEDULER_ENABLED', true);
+    if (!this.enabled) {
       this.logger.log('Monthly snapshot scheduler disabled by MONTHLY_SNAPSHOT_SCHEDULER_ENABLED');
       return;
     }
@@ -25,6 +26,10 @@ export class MonthlySnapshotScheduler implements OnModuleInit, OnModuleDestroy {
 
   onModuleDestroy(): void {
     this.clearTimer();
+  }
+
+  isRegistrationHealthy(): boolean {
+    return this.enabled && this.timer !== null;
   }
 
   private scheduleNextRun(from: Date): void {

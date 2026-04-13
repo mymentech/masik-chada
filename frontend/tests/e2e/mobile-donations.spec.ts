@@ -10,6 +10,8 @@ test.describe('mobile donations route', () => {
 
     await expect(page).toHaveURL(/\/donations$/);
     await expect(page.getByRole('heading', { name: 'দান সংগ্রহ' })).toBeVisible();
-    await expect(page.getByText('মোবাইল-ফার্স্ট দ্রুত কালেকশন ফ্লো এখানে তৈরি হবে।')).toBeVisible();
+    await expect(
+      page.getByText('মোবাইল কালেকশনের জন্য ডোনার সিলেক্ট করে দ্রুত পেমেন্ট যোগ করুন।')
+    ).toBeVisible();
   });
 });

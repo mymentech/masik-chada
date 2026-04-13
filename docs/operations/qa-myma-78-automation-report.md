@@ -2,11 +2,11 @@
 
 Related tickets: [MYMA-78](/MYMA/issues/MYMA-78), [MYMA-76](/MYMA/issues/MYMA-76), [MYMA-72](/MYMA/issues/MYMA-72), [MYMA-73](/MYMA/issues/MYMA-73), [MYMA-57](/MYMA/issues/MYMA-57)
 
-## Latest Execution Snapshot (2026-04-11T21:15:54Z)
+## Latest Execution Snapshot (2026-04-12T12:15:34Z)
 
 - Canonical regression runner:
   - Command: `./scripts/run-qa-regression.sh`
-  - Artifact: `docs/operations/test-artifacts/qa-regression-20260411T211554Z.log`
+  - Artifact: `docs/operations/test-artifacts/qa-regression-20260412T121534Z.log`
   - Exit: `1` (blocked by E2E runtime dependency)
 
 - Backend unit regression:
@@ -14,7 +14,7 @@ Related tickets: [MYMA-78](/MYMA/issues/MYMA-78), [MYMA-76](/MYMA/issues/MYMA-76
   - Result: **PASS** (`14/14` tests)
 - Frontend unit/integration:
   - Command: `cd frontend && npm ci --include=dev && npm test` (via runner)
-  - Result: **PASS** (`4/4` tests)
+  - Result: **PASS** (`11/11` tests)
 - Frontend E2E mobile smoke:
   - Command: `cd frontend && npm run test:e2e` (via runner)
   - Result: **FAIL**
@@ -38,13 +38,19 @@ Related tickets: [MYMA-78](/MYMA/issues/MYMA-78), [MYMA-76](/MYMA/issues/MYMA-76
 - Files:
   - `frontend/src/components/PrivateRoute.test.jsx`
   - `frontend/src/api/apolloClient.test.js`
+  - `frontend/src/pages/Donations.test.jsx`
+  - `frontend/src/pages/Donors.test.jsx`
+  - `frontend/src/pages/Reports.test.jsx`
 - Coverage:
   - Protected route redirects unauthenticated users to `/login`
   - Protected route allows authenticated users
   - Expired auth handling clears token and redirects to `/login`
   - No redirect loop while already on `/login`
+  - Donations payment success and failure behavior
+  - Donor create/update/delete flow behavior
+  - Reports month-change query behavior
 - Command: `cd frontend && npm test`
-- Result: **PASS** (4/4 tests)
+- Result: **PASS** (11/11 tests)
 
 ### Lightweight E2E mobile smoke
 - Harness: Playwright in `frontend/`
@@ -59,18 +65,26 @@ Related tickets: [MYMA-78](/MYMA/issues/MYMA-78), [MYMA-76](/MYMA/issues/MYMA-76
 
 ## Defects / Gaps
 
-### D-001 (High) — Donations payment flow is not implemented, so MYMA-57 payment-flow automation is not yet possible
+### D-001 (Resolved) — Donations payment flow and component-level automation are now implemented
 - Owner: Frontend execution lane ([MYMA-72](/MYMA/issues/MYMA-72))
 - Evidence:
-  - `frontend/src/pages/Donations.jsx` currently renders placeholder copy only.
-  - Missing test targets for required flow hooks from [MYMA-57](/MYMA/issues/MYMA-57): donor search, donor select, payment input, submit mutation, success/error feedback, immediate balance refresh.
+  - `frontend/src/pages/Donations.jsx` implements donor search/select and payment submission mutation flow.
+  - `frontend/src/pages/Donations.test.jsx` covers required flow hooks from [MYMA-57](/MYMA/issues/MYMA-57): donor select, payment input, submit mutation, success feedback, error feedback, selection reset after successful submit.
 - Impact:
-  - Full mobile payment-flow regression automation cannot be executed yet; only route-level smoke is possible.
+  - Feature-level regression coverage is available via React/Vitest tests.
+  - End-to-end execution remains blocked only by runtime dependency issue tracked as D-002.
+
+### D-004 (Resolved) — Donor CRUD automation gap closed at component level
+- Owner: Frontend execution lane ([MYMA-72](/MYMA/issues/MYMA-72))
+- Evidence:
+  - `frontend/src/pages/Donors.test.jsx` now covers create, update, and delete flows with mutation/refetch assertions and confirmation handling.
+- Impact:
+  - CRUD acceptance is now covered in executable frontend automation pending E2E runtime availability.
 
 ### D-002 (Medium) — Playwright browser launch blocked in this runtime
 - Owner: QA/DevOps runtime provisioning
 - Evidence:
-  - Latest canonical runner (`2026-04-11T21:15:54Z`) fails on browser startup:
+  - Latest canonical runner (`2026-04-12T12:15:34Z`) fails on browser startup:
     - `chrome-headless-shell: error while loading shared libraries: libglib-2.0.so.0`
 - Impact:
   - E2E suite is authored but cannot execute in current environment until runtime libraries are installed.
@@ -93,5 +107,8 @@ Related tickets: [MYMA-78](/MYMA/issues/MYMA-78), [MYMA-76](/MYMA/issues/MYMA-76
   - `frontend/vitest.config.js`
   - `frontend/src/test/setup.js`
   - `frontend/src/api/apolloClient.js` (exported auth-error helper for deterministic tests)
+  - `frontend/src/pages/Donations.test.jsx` (payment-flow automation for MYMA-57 hooks)
+  - `frontend/src/pages/Donors.test.jsx` (create/update/delete donor automation)
+  - `frontend/src/pages/Reports.test.jsx` (monthly report query/render automation)
 - QA Operations:
   - `scripts/run-qa-regression.sh` consolidated regression runner with timestamped artifact logs under `docs/operations/test-artifacts/`

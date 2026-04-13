@@ -15,6 +15,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ReportsModule } from './reports/reports.module';
 import { JobsModule } from './jobs/jobs.module';
+import { HealthModule } from './health/health.module';
 import { AppResolver } from './app.resolver';
 
 @Module({
@@ -57,6 +58,7 @@ import { AppResolver } from './app.resolver';
     DashboardModule,
     ReportsModule,
     JobsModule,
+    HealthModule,
   ],
   providers: [
     AppResolver,

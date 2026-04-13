@@ -44,6 +44,14 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
+def preserves_non_ascii(text: str) -> bool:
+    return any(ord(ch) > 127 for ch in text)
+
+
+def sample_rows(rows: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    return rows[:limit]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Dry-run SQL to Mongo transform")
     parser.add_argument("--input", required=True, help="Path to SQL dump")
@@ -112,7 +120,7 @@ def main() -> int:
             {
                 "_id": object_id,
                 "legacy_id": int(legacy_id),
-                "name": str(row["name"]).strip(),
+                "name": str(row["name"]),
                 "email": email,
                 "password": row["password"],
                 "created_at": parse_date(row.get("created_at")) or datetime.now(UTC).isoformat(),
@@ -179,9 +187,9 @@ def main() -> int:
                 "_id": object_id,
                 "legacy_id": int(legacy_id),
                 "serial_number": serial,
-                "name": str(row.get("name") or "").strip(),
+                "name": str(row.get("name") or ""),
                 "phone": str(row.get("phone") or "").strip() or "+880",
-                "address": str(row.get("address") or "").strip(),
+                "address": str(row.get("address") or ""),
                 "monthly_amount": float(monthly_amount),
                 "registration_date": registration_date,
                 "due_from": None,
@@ -269,6 +277,125 @@ def main() -> int:
         )
 
     quarantine_by_reason = Counter(item["reason"] for item in quarantine)
+    quarantine_by_entity = Counter(item["entity"] for item in quarantine)
+
+    users_by_legacy_id = {row["legacy_id"]: row for row in users_out}
+    donors_by_legacy_id = {row["legacy_id"]: row for row in donors_out}
+    payments_by_legacy_id = {
+        row["legacy_id"]: row for row in payments_out if isinstance(row.get("legacy_id"), int)
+    }
+
+    bengali_checks: list[dict[str, Any]] = []
+    bengali_failures: list[dict[str, Any]] = []
+
+    for source_row in users_src:
+        transformed = users_by_legacy_id.get(source_row.get("id"))
+        if transformed is None:
+            continue
+        source_name = str(source_row.get("name") or "")
+        if preserves_non_ascii(source_name):
+            check = {
+                "entity": "users",
+                "legacy_id": source_row["id"],
+                "field": "name",
+                "source": source_name,
+                "transformed": transformed["name"],
+                "match": source_name == transformed["name"],
+            }
+            bengali_checks.append(check)
+            if not check["match"]:
+                bengali_failures.append(check)
+
+    for source_row in donors_src:
+        transformed = donors_by_legacy_id.get(source_row.get("id"))
+        if transformed is None:
+            continue
+        for field in ("name", "address"):
+            source_value = str(source_row.get(field) or "")
+            if not source_value or not preserves_non_ascii(source_value):
+                continue
+            check = {
+                "entity": "donors",
+                "legacy_id": source_row["id"],
+                "field": field,
+                "source": source_value,
+                "transformed": transformed[field],
+                "match": source_value == transformed[field],
+            }
+            bengali_checks.append(check)
+            if not check["match"]:
+                bengali_failures.append(check)
+
+    parity = {
+        "users": {
+            "source": len(users_src),
+            "transformed": len(users_out),
+            "quarantined": quarantine_by_entity["users"],
+            "balanced": len(users_src) == len(users_out) + quarantine_by_entity["users"],
+        },
+        "donors": {
+            "source": len(donors_src),
+            "transformed": len(donors_out),
+            "quarantined": quarantine_by_entity["donors"],
+            "balanced": len(donors_src) == len(donors_out) + quarantine_by_entity["donors"],
+        },
+        "payments": {
+            "source": len(payments_src),
+            "transformed": len(payments_out),
+            "quarantined": quarantine_by_entity["payments"],
+            "balanced": len(payments_src) == len(payments_out) + quarantine_by_entity["payments"],
+        },
+    }
+
+    golden_records = {
+        "users": [
+            {
+                "legacy_id": row["id"],
+                "source": {
+                    "name": row["name"],
+                    "email": str(row.get("email") or "").strip().lower(),
+                    "password": row["password"],
+                },
+                "transformed": users_by_legacy_id[row["id"]],
+            }
+            for row in sample_rows([row for row in users_src if row.get("id") in users_by_legacy_id], 3)
+        ],
+        "donors": [
+            {
+                "legacy_id": row["id"],
+                "source": {
+                    "serial_number": row["serial_number"],
+                    "name": row["name"],
+                    "address": row["address"],
+                    "monthly_amount": row["monthly_amount"],
+                    "registration_date": row["registration_date"],
+                },
+                "transformed": donors_by_legacy_id[row["id"]],
+            }
+            for row in sample_rows([row for row in donors_src if row.get("id") in donors_by_legacy_id], 5)
+        ],
+        "payments": [
+            {
+                "legacy_id": row["id"],
+                "source": {
+                    "donor_id": row["donor_id"],
+                    "collector_id": row["collector_id"],
+                    "amount": row["amount"],
+                    "payment_date": row["payment_date"],
+                },
+                "transformed": payments_by_legacy_id[row["id"]],
+            }
+            for row in sample_rows([row for row in payments_src if row.get("id") in payments_by_legacy_id], 5)
+        ],
+    }
+
+    bengali_report = {
+        "checked_fields_total": len(bengali_checks),
+        "failed_fields_total": len(bengali_failures),
+        "status": "pass" if not bengali_failures else "fail",
+        "sample_passes": sample_rows([check for check in bengali_checks if check["match"]], 10),
+        "failures": bengali_failures,
+    }
 
     report = {
         "run_at_utc": datetime.now(UTC).isoformat(),
@@ -286,9 +413,25 @@ def main() -> int:
             "quarantine_total": len(quarantine),
         },
         "quarantine_by_reason": dict(sorted(quarantine_by_reason.items())),
+        "parity": parity,
         "id_map_counts": {
             "users": len(user_id_map),
             "donors": len(donor_id_map),
+        },
+        "bengali_fidelity": {
+            "checked_fields_total": bengali_report["checked_fields_total"],
+            "failed_fields_total": bengali_report["failed_fields_total"],
+            "status": bengali_report["status"],
+        },
+        "artifact_paths": {
+            "users_transformed": str(out_dir / "users.transformed.jsonl"),
+            "donors_transformed": str(out_dir / "donors.transformed.jsonl"),
+            "payments_transformed": str(out_dir / "payments.transformed.jsonl"),
+            "quarantine": str(out_dir / "quarantine.jsonl"),
+            "id_maps": str(out_dir / "id-maps.json"),
+            "golden_records": str(out_dir / "golden-records.json"),
+            "bengali_fidelity_report": str(out_dir / "bengali-fidelity-report.json"),
+            "dryrun_report": str(out_dir / "dryrun-report.json"),
         },
         "notes": [
             "donors.due_from is set to null because source dump has no due_from column",
@@ -303,6 +446,12 @@ def main() -> int:
     (out_dir / "id-maps.json").write_text(
         json.dumps({"users": user_id_map, "donors": donor_id_map}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
+    )
+    (out_dir / "golden-records.json").write_text(
+        json.dumps(golden_records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (out_dir / "bengali-fidelity-report.json").write_text(
+        json.dumps(bengali_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     (out_dir / "dryrun-report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

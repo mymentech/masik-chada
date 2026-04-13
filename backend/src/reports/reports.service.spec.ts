@@ -56,4 +56,79 @@ describe('ReportsService.monthlyReport', () => {
       ],
     });
   });
+
+  it('returns zero totals and skips collector lookup when no collector rows exist', async () => {
+    const { ReportsService } = await import('./reports.service');
+
+    const aggregateExec = vi.fn().mockResolvedValue([
+      {
+        totals: [],
+        byCollector: [],
+      },
+    ]);
+    const paymentModel = {
+      aggregate: vi.fn().mockReturnValue({
+        exec: aggregateExec,
+      }),
+    };
+
+    const userModel = {
+      find: vi.fn(),
+    };
+
+    const donorsService = {
+      totalBalance: vi.fn().mockResolvedValue(0),
+    };
+
+    const service = new ReportsService(paymentModel as never, userModel as never, donorsService as never);
+    const report = await service.monthlyReport('2026-04');
+
+    expect(userModel.find).not.toHaveBeenCalled();
+    expect(report).toEqual({
+      collected: 0,
+      totalBalance: 0,
+      byCollector: [],
+    });
+  });
+
+  it('ignores null collector ids for user lookup and keeps Unknown fallback in output', async () => {
+    const { ReportsService } = await import('./reports.service');
+
+    const aggregateExec = vi.fn().mockResolvedValue([
+      {
+        totals: [{ collected: 100 }],
+        byCollector: [
+          { _id: null, total: 20 },
+          { _id: 'u1', total: 80 },
+        ],
+      },
+    ]);
+    const paymentModel = {
+      aggregate: vi.fn().mockReturnValue({
+        exec: aggregateExec,
+      }),
+    };
+
+    const userFindExec = vi.fn().mockResolvedValue([{ _id: 'u1', name: 'Collector One' }]);
+    const userModel = {
+      find: vi.fn().mockReturnValue({
+        lean: vi.fn().mockReturnValue({
+          exec: userFindExec,
+        }),
+      }),
+    };
+
+    const donorsService = {
+      totalBalance: vi.fn().mockResolvedValue(0),
+    };
+
+    const service = new ReportsService(paymentModel as never, userModel as never, donorsService as never);
+    const report = await service.monthlyReport('2026-04');
+
+    expect(userModel.find).toHaveBeenCalledWith({ _id: { $in: ['u1'] } });
+    expect(report.byCollector).toEqual([
+      { name: 'Unknown', total: 20 },
+      { name: 'Collector One', total: 80 },
+    ]);
+  });
 });

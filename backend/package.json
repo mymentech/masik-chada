@@ -8,6 +8,7 @@
     "start:dev": "ts-node src/main.ts",
     "jobs:monthly-snapshot": "node dist/jobs/run-monthly-snapshot-job.js",
     "jobs:monthly-snapshot:dev": "ts-node src/jobs/run-monthly-snapshot-job.ts",
+    "validation:migration:dry-run": "../scripts/run-migration-dryrun.sh",
     "migration:sync-donor-serial-counter": "node dist/migrations/sync-donor-serial-counter.js",
     "migration:sync-donor-serial-counter:dev": "ts-node src/migrations/sync-donor-serial-counter.ts",
     "test": "vitest run",

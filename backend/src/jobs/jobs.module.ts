@@ -22,6 +22,6 @@ import { MonthlyJobRun, MonthlyJobRunSchema } from './schemas/monthly-job-run.sc
     ]),
   ],
   providers: [MonthlySnapshotService, MonthlySnapshotScheduler],
-  exports: [MonthlySnapshotService],
+  exports: [MonthlySnapshotService, MonthlySnapshotScheduler],
 })
 export class JobsModule {}
