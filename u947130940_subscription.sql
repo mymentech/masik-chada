@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 05, 2026 at 09:29 AM
+-- Generation Time: Apr 13, 2026 at 08:22 AM
 -- Server version: 11.8.6-MariaDB-log
 -- PHP Version: 7.2.34
 
@@ -7773,8 +7773,8 @@ INSERT INTO `dues` (`id`, `donor_id`, `month_year`, `amount_due`, `paid_amount`,
 (6903, 531, '2026-01', 100.00, 0.00, '2026-01-01 20:16:31', '2026-01-01 20:16:31'),
 (6904, 532, '2025-01', 100.00, 100.00, '2026-01-01 20:16:31', '2026-01-02 13:32:01'),
 (6905, 532, '2025-02', 100.00, 100.00, '2026-01-01 20:16:31', '2026-02-06 10:44:13'),
-(6906, 532, '2025-03', 100.00, 0.00, '2026-01-01 20:16:31', '2026-01-01 20:16:31'),
-(6907, 532, '2025-04', 100.00, 0.00, '2026-01-01 20:16:31', '2026-01-01 20:16:31'),
+(6906, 532, '2025-03', 100.00, 100.00, '2026-01-01 20:16:31', '2026-04-10 12:21:09'),
+(6907, 532, '2025-04', 100.00, 100.00, '2026-01-01 20:16:31', '2026-04-10 12:21:09'),
 (6908, 532, '2025-05', 100.00, 0.00, '2026-01-01 20:16:31', '2026-01-01 20:16:31'),
 (6909, 532, '2025-06', 100.00, 100.00, '2026-01-01 20:16:31', '2026-01-01 20:16:31'),
 (6910, 532, '2025-07', 100.00, 100.00, '2026-01-01 20:16:31', '2026-01-01 20:16:31'),
@@ -14826,7 +14826,8 @@ INSERT INTO `payments` (`id`, `donor_id`, `collector_id`, `due_id`, `amount`, `p
 (1688, 369, 1, NULL, 100.00, '2026-03-28', '2026-03-28 11:14:29', '2026-03-28 11:14:29'),
 (1689, 374, 1, NULL, 100.00, '2026-03-28', '2026-03-28 11:14:42', '2026-03-28 11:14:42'),
 (1690, 382, 1, NULL, 100.00, '2026-03-28', '2026-03-28 11:14:49', '2026-03-28 11:14:49'),
-(1691, 383, 1, NULL, 100.00, '2026-03-28', '2026-03-28 11:14:57', '2026-03-28 11:14:57');
+(1691, 383, 1, NULL, 100.00, '2026-03-28', '2026-03-28 11:14:57', '2026-03-28 11:14:57'),
+(1692, 532, 1, NULL, 200.00, '2026-04-10', '2026-04-10 12:21:09', '2026-04-10 12:21:09');
 
 -- --------------------------------------------------------
 
@@ -14895,21 +14896,10 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('2wZI643qcQmASzNmLYbIhDuaXv69AeyLkp18NvYs', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiSFNWVXExNWpMTTVGeURXdEpicGdXeWY1cWpiMG9KbG9BMUlsNnF2SyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1774834780),
-('DQoMFqDeWulqkqFsJUabujaAJF3ZUBWYTX3rtRsJ', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiZXowcHY4SHVkWVR4clhqYnlPZ3c3a2d0OUxlM3R1b0RlOHR4RDM4eSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775189067),
-('ELypoFRtPImgxFE7jhpWmZKjozXV235DT3qpanxl', 1, '37.111.213.175', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Mobile Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiTGRObkl4dHBjQ2JQdVRxN01nR1lmVnJNelBtSkI3VzF2R0dBWmZoMSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1774696245),
-('ezlEA4VyF5mBKz1hNyZkjtjbXbjxafmzb2Cug5eA', 1, '91.207.173.99', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoid1RpUkdPWFFJYmRPbjV1TE9OWGFFQnFKTnFwNUdxQnVRbnA2ZVdKdyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NjM6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20vc3RhdGlzdGljcy9wZGY/bW9udGg9MjAyNi0wMyI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1774696538),
-('GD9YETQK3ToYgYVrJcBa60KouRVByfikhveWagLF', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoia00xUUdYM0dTNG5aNWFUUmFUWkZ0eEV2blQwZ3RaZnpzNFBIbEpEcSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775012491),
-('GpuSIVIEfDriQfcGjTjW082S4FuRIHphshntovXf', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVnZwSndaUjJpMVFhYm5VQW9JSWlTN2lYSFczbFpQRk5lMFEydjJBSCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1774783501),
-('icE15Sge6OOUGUKscI3E8E50hpGewIaEVKZitwVs', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiTVQ4U3YzS05YNDFWeHJJbkZKOXVtclh4YU9HU1hkalliRGxUeEsyeSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1774973800),
-('IlG6mSCsuUXpiYzrn5sldGhSF5ScWCFdx38nK6ux', NULL, '37.111.218.177', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Mobile Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicng3QXVRSzM3NmNqZ0M2cGV5bXVKVFN2MGVIQmhHczdIU25tTHdWMCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1774802038),
-('kBo6KPhTAIIEpSSjmHdaSnmU2Jz4xqV3VXsiBBoN', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiWjc4NHZHa2w5NE9QMHdBbTByQTduY2NXV3dOQ1U3dWVXRXZUSmZlZSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1774931954),
-('m7Q1G5LUu0DnO0u58oYKkJJkyDVyk2a1GojKWm6I', NULL, '91.134.35.95', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36 Edge/74.0.1281.101', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRFM5TksyU0psb2ZjeXdTeWVjM0dsaDJNQ3RKZW5NaXJPaHB1Q29BWSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1775168651),
-('nh9C0ffMyRb9YBRXyZyjTO5C0SFR0muLW120t9kf', NULL, '34.222.174.171', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoianJkNzNXekFkNUcyNHRCS2tiNWNwNURka2N5Ym1BYnZ1aUt5R09KRyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1775048961),
-('taVmog9SOeEqilbSzbVfzew309u7qYURpOr2lW66', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiWHJqaktVMTBzTktGQmRYRGZnNFltRndIVllNZHM5c2d1bXBDTFFVMyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775286857),
-('U6XrHerCqqAFMw9GoebTRVpbwLomH1CR5g779f4F', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiTElCR1k1WHgybnVnYlBHR1d1cXBmV0ZsT0o1elNwZmZUMEw5dmp4NSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775371819),
-('vC8xhrCouI3rWdGZqbEJKxaNyfGn7pX4pAQ1Ld8s', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoicmlGdE5UeEdUMFY4a3F6SXExb0RTZktYeFNOVHdaYm5WVVdNMUlwQiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775131254),
-('zEQerK1GQGTDzmqMZqh6kqXD9L9kHsrqQAmaXt6E', NULL, '34.244.209.234', 'Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVEVHWWJYb0V4c0o3eXplZnRhWGdsc1Y4MnNQeEU1OEdkcTlQeUhTSSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1775267868);
+('5ADiZJ02bBFdwX1jz357cidaUn2hna9MrLeaz9bQ', 1, '37.111.221.75', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Mobile Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiV240NmtPS1VKVGRSWlFvZ2p5aHVEUlZEbnUwWXIxZjFiU1lXRTN1NyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTI6Imh0dHBzOi8vc3Vic2NyaXB0aW9uLm15bWVudGVjaC5jb20vZG9ub3IvNjIxL2hpc3RvcnkiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1775998893),
+('8oDccOmk9lE57pjRRwj9xCBgHNxfqRrBDSzIC5vs', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiUFEzTXRHeXlTMVZ3MVZEZW9LSTdldkk0bDhrT2MzaG9rSVJuMjRUWiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1776065651),
+('IctQIpIIt1YHT4fx35GwBibgKqpauNQoDlIoAqVL', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiNkZaNHhlN2V3aWpwVER1aHdIZnBCdVhCUWNucks1UG5zb0hCQWVCTCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775877528),
+('oc7URNwxrcSYGevvQEgkKtFeAYyWECFHi5eBJ6do', NULL, '82.197.81.97', 'Go-http-client/2.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiZHd6RXJiUldDRmFxQ3kxRXFPcUdZOWhvRklMN29kTnVZN0JMSUtiWCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1775981182);
 
 -- --------------------------------------------------------
 
@@ -15096,7 +15086,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1692;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1693;
 
 --
 -- AUTO_INCREMENT for table `permissions`
