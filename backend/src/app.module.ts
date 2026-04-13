@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { getBoolean, getNumber } from './common/config/runtime-config';
 import { createDepthLimitRule } from './common/graphql/depth-limit.rule';
+import { normalizeGraphqlErrorCode } from './common/graphql/error-code-map';
 import { createRequestLimitsPlugin } from './common/graphql/request-limits.plugin';
 import { GqlAuthGuard } from './common/guards/gql-auth.guard';
 import { UsersModule } from './users/users.module';
@@ -42,6 +43,17 @@ import { AppResolver } from './app.resolver';
           autoSchemaFile: true,
           context: ({ req, res }: { req: unknown; res: unknown }) => ({ req, res }),
           driver: ApolloDriver,
+          formatError: (formattedError) => ({
+            ...formattedError,
+            extensions: {
+              ...formattedError.extensions,
+              code: normalizeGraphqlErrorCode(
+                typeof formattedError.extensions?.code === 'string'
+                  ? formattedError.extensions.code
+                  : undefined,
+              ),
+            },
+          }),
           introspection,
           path: '/graphql',
           playground,

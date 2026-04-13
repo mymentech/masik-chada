@@ -37,7 +37,7 @@ export class Donor {
   @Prop({ required: true, type: Date })
   registration_date!: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Prop({ type: Date, default: null })
   due_from!: Date | null;
 

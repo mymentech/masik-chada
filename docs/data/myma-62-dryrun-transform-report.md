@@ -1,6 +1,6 @@
 # MYMA-62 Dry-Run Transform Report
 
-Run timestamp (UTC): `2026-04-12T12:08:22.065907+00:00`
+Run timestamp (UTC): `2026-04-13T08:44:46.749408+00:00`
 Source: `u947130940_subscription.sql`
 Execution path: `./scripts/run-migration-dryrun.sh`
 
