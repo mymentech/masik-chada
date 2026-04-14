@@ -12,6 +12,8 @@
     "migration:sync-donor-serial-counter": "node dist/migrations/sync-donor-serial-counter.js",
     "migration:sync-donor-serial-counter:dev": "ts-node src/migrations/sync-donor-serial-counter.ts",
     "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run --passWithNoTests 'src/**/*.integration.spec.ts'",
     "test:watch": "vitest"
   },
   "dependencies": {
