@@ -38,7 +38,7 @@ This handoff provides the deployment baseline for `subscription.mymentech.com` u
    ```
 3. Run one-time migration seed:
    ```bash
-   docker exec masik_backend node src/scripts/seed.js
+   docker exec masik_backend node dist/migrations/sync-donor-serial-counter.js
    ```
 4. Verify browser-facing endpoints through the TLS terminator:
    - `https://subscription.mymentech.com/` (frontend)
