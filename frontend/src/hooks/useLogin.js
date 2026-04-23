@@ -8,8 +8,9 @@ export function useLogin() {
   const [runLogin, state] = useMutation(LOGIN_MUTATION, {
     onCompleted: (result) => {
       const token = result?.login?.token;
+      const userData = result?.login?.user || null;
       if (token) {
-        login(token);
+        login(token, userData);
       }
     }
   });

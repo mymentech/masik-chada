@@ -1,7 +1,9 @@
 import { Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import PrivateRoute from './components/PrivateRoute';
+import { useIsMobile } from './context/MobileContext';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Donations = lazy(() => import('./pages/Donations'));
@@ -12,16 +14,18 @@ const Reports = lazy(() => import('./pages/Reports'));
 
 function RouteFallback() {
   return (
-    <section className="container page-shell">
-      <p>পৃষ্ঠা লোড হচ্ছে...</p>
-    </section>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+      <p style={{ color: '#9ca3af', fontSize: 14 }}>পৃষ্ঠা লোড হচ্ছে...</p>
+    </div>
   );
 }
 
 function AppLayout() {
+  const isMobile = useIsMobile();
+
   return (
     <>
-      <Navbar />
+      {!isMobile && <Navbar />}
       <main className="page-main">
         <Suspense fallback={<RouteFallback />}>
           <Routes>
@@ -33,6 +37,7 @@ function AppLayout() {
           </Routes>
         </Suspense>
       </main>
+      {isMobile && <BottomNav />}
     </>
   );
 }
