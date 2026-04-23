@@ -53,6 +53,17 @@ export const ADDRESSES_QUERY = gql`
   }
 `;
 
+export const DONOR_PAYMENTS_QUERY = gql`
+  query DonorPayments($donorId: String!) {
+    donorPayments(donorId: $donorId) {
+      id
+      amount
+      payment_date
+      created_at
+    }
+  }
+`;
+
 export const MONTHLY_REPORT_QUERY = gql`
   query MonthlyReport($month: String!) {
     monthlyReport(month: $month) {
@@ -61,6 +72,15 @@ export const MONTHLY_REPORT_QUERY = gql`
       byCollector {
         name
         total
+      }
+      payments {
+        id
+        donor_serial
+        donor_name
+        donor_address
+        amount
+        payment_date
+        collector_name
       }
     }
   }

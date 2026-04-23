@@ -131,7 +131,7 @@ export class DonorsService {
 
     const paidMap = await this.paymentTotalsByDonor(undefined, asOf);
     return donors.reduce((acc, donor) => {
-      const totalPaid = paidMap.get(donor.id) || 0;
+      const totalPaid = paidMap.get(Number(donor.id)) || 0;
       const totalDue = calculateTotalDue(donor, asOf || new Date());
       return acc + calculateOutstandingBalance(totalDue, totalPaid);
     }, 0);
@@ -179,7 +179,7 @@ export class DonorsService {
   }
 
   private toDonorBalance(donor: Donor, paidMap: Map<number, number>): DonorBalance {
-    const total_paid = Number((paidMap.get(donor.id) || 0).toFixed(2));
+    const total_paid = Number((paidMap.get(Number(donor.id)) || 0).toFixed(2));
     const total_due = calculateTotalDue(donor);
     const balance = calculateOutstandingBalance(total_due, total_paid);
 

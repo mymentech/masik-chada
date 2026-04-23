@@ -7,6 +7,7 @@ import {
 } from '../graphql/mutations';
 import { DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
 import { useIsMobile } from '../context/MobileContext';
+import PaymentHistory from '../components/PaymentHistory';
 
 function todayDateOnly() {
   return new Date().toISOString().slice(0, 10);
@@ -238,6 +239,148 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
   );
 }
 
+function DonorViewSheet({ donor, onClose, onEdit }) {
+  if (!donor) return null;
+  const isPaid = Number(donor.balance) <= 0;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="দাতার বিস্তারিত"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.48)',
+        zIndex: 40,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: '20px 20px 0 0',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+          maxHeight: '92svh',
+          overflowY: 'auto',
+          animation: 'sheetUp 300ms ease-out',
+          margin: '0 auto',
+          width: '100%',
+          maxWidth: 640,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px' }}>
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: '#d1d5db' }} />
+        </div>
+        <div style={{ padding: '4px 20px 28px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, gap: 10 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <SerialBadge number={donor.serial_number} />
+                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>
+                  {donor.name}
+                </h2>
+              </div>
+              <div style={{ fontSize: 13, color: '#6b7280' }}>{donor.address}</div>
+              {donor.phone && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>{donor.phone}</div>}
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: '#f3f4f6',
+                border: 'none',
+                borderRadius: '50%',
+                width: 32,
+                height: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#6b7280',
+                flexShrink: 0,
+              }}
+              aria-label="বন্ধ করুন"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 8,
+              marginBottom: 16,
+            }}
+          >
+            <div style={{ background: '#f9fafb', borderRadius: 10, padding: '10px 12px' }}>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>মাসিক</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>
+                {formatMoney(donor.monthly_amount)}
+              </div>
+            </div>
+            <div style={{ background: '#f0fdf4', borderRadius: 10, padding: '10px 12px' }}>
+              <div style={{ fontSize: 11, color: '#166534', marginBottom: 2 }}>পরিশোধিত</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#166534' }}>
+                {formatMoney(donor.total_paid)}
+              </div>
+            </div>
+            <div
+              style={{
+                background: isPaid ? '#f0fdf4' : '#fef2f2',
+                borderRadius: 10,
+                padding: '10px 12px',
+              }}
+            >
+              <div style={{ fontSize: 11, color: isPaid ? '#166534' : '#991b1b', marginBottom: 2 }}>
+                বকেয়া
+              </div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: isPaid ? '#166534' : '#ef4444',
+                }}
+              >
+                {isPaid ? 'নেই' : formatMoney(donor.balance)}
+              </div>
+            </div>
+          </div>
+
+          <PaymentHistory donorId={donor.id} title="সকল পেমেন্ট হিস্ট্রি" maxHeight={360} />
+
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => { onEdit(donor); onClose(); }}
+              style={{
+                marginTop: 16,
+                width: '100%',
+                height: 44,
+                background: '#dbeafe',
+                color: '#1d4ed8',
+                border: 'none',
+                borderRadius: 12,
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: 'pointer',
+              }}
+            >
+              এডিট করুন
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SerialBadge({ number }) {
   return (
     <span
@@ -268,6 +411,7 @@ export default function Donors() {
   const [form, setForm] = useState(initialForm());
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showFormSheet, setShowFormSheet] = useState(false);
+  const [viewingDonor, setViewingDonor] = useState(null);
 
   const searchText = search.trim();
   const variables = useMemo(
@@ -545,6 +689,23 @@ export default function Donors() {
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     <button
                       type="button"
+                      onClick={() => setViewingDonor(donor)}
+                      style={{
+                        background: '#f0fdf4',
+                        color: '#166534',
+                        border: 'none',
+                        borderRadius: 8,
+                        height: 30,
+                        padding: '0 10px',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ভিউ
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => beginEdit(donor)}
                       style={{
                         background: '#dbeafe',
@@ -654,6 +815,12 @@ export default function Donors() {
             </div>
           </div>
         )}
+
+        <DonorViewSheet
+          donor={viewingDonor}
+          onClose={() => setViewingDonor(null)}
+          onEdit={beginEdit}
+        />
       </div>
     );
   }
@@ -775,7 +942,7 @@ export default function Donors() {
               background: '#f0fdf4',
               padding: '8px 20px',
               display: 'grid',
-              gridTemplateColumns: '40px 1fr 120px 100px 90px 100px',
+              gridTemplateColumns: '40px 1fr 120px 100px 90px 160px',
               gap: 8,
               alignItems: 'center',
             }}
@@ -804,7 +971,7 @@ export default function Donors() {
                   borderBottom: '1px solid #f3f4f6',
                   padding: '12px 20px',
                   display: 'grid',
-                  gridTemplateColumns: '40px 1fr 120px 100px 90px 100px',
+                  gridTemplateColumns: '40px 1fr 120px 100px 90px 160px',
                   gap: 8,
                   alignItems: 'center',
                 }}
@@ -827,6 +994,23 @@ export default function Donors() {
                   )}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    type="button"
+                    onClick={() => setViewingDonor(donor)}
+                    style={{
+                      background: '#f0fdf4',
+                      color: '#166534',
+                      border: 'none',
+                      borderRadius: 8,
+                      height: 32,
+                      padding: '0 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ভিউ
+                  </button>
                   <button
                     type="button"
                     onClick={() => beginEdit(donor)}
@@ -891,6 +1075,12 @@ export default function Donors() {
           />
         </div>
       </div>
+
+      <DonorViewSheet
+        donor={viewingDonor}
+        onClose={() => setViewingDonor(null)}
+        onEdit={beginEdit}
+      />
     </div>
   );
 }

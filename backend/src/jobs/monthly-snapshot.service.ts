@@ -63,7 +63,7 @@ export class MonthlySnapshotService {
 
     for (const donor of donors) {
       try {
-        const totalPaid = Number((paidMap.get(donor.id) || 0).toFixed(2));
+        const totalPaid = Number((paidMap.get(Number(donor.id)) || 0).toFixed(2));
         const totalDue = calculateTotalDue(donor, monthEnd);
         const balance = calculateOutstandingBalance(totalDue, totalPaid);
 

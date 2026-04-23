@@ -15,6 +15,19 @@ function formatMoney(value) {
   }).format(Number(value || 0));
 }
 
+function formatDate(value) {
+  if (!value) return '';
+  try {
+    return new Intl.DateTimeFormat('bn-BD', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    }).format(new Date(value));
+  } catch {
+    return String(value).slice(0, 10);
+  }
+}
+
 function DownloadIcon() {
   return (
     <svg
@@ -384,6 +397,175 @@ export default function Reports() {
                     {formatMoney(totalByCollectors)}
                   </span>
                 </div>
+              )}
+            </div>
+
+            {/* Detailed payments table */}
+            <div
+              style={{
+                background: '#ffffff',
+                borderRadius: 16,
+                overflow: 'hidden',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+              }}
+            >
+              <div
+                style={{
+                  background: '#166534',
+                  padding: '14px 20px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>
+                  পেমেন্ট বিবরণী
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                  {report.payments?.length ?? 0} টি পেমেন্ট
+                </span>
+              </div>
+
+              {report.payments?.length === 0 ? (
+                <p style={{ textAlign: 'center', color: '#9ca3af', padding: '32px 0', fontSize: 14 }}>
+                  এই মাসে কোনো পেমেন্ট নেই।
+                </p>
+              ) : null}
+
+              {report.payments?.length > 0 && !isMobile && (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '60px 1fr 1fr 120px 140px 110px',
+                    gap: 8,
+                    padding: '10px 20px',
+                    background: '#f0fdf4',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#166534',
+                  }}
+                >
+                  <span>সিরিয়াল</span>
+                  <span>নাম</span>
+                  <span>ঠিকানা</span>
+                  <span>কালেক্টর</span>
+                  <span>তারিখ</span>
+                  <span style={{ textAlign: 'right' }}>পরিমাণ</span>
+                </div>
+              )}
+
+              {report.payments?.map((p, idx) =>
+                isMobile ? (
+                  <div
+                    key={p.id}
+                    style={{
+                      padding: '12px 16px',
+                      background: idx % 2 === 0 ? '#ffffff' : '#f9fafb',
+                      borderBottom: '1px solid #f3f4f6',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                        <span
+                          style={{
+                            background: '#dcfce7',
+                            color: '#166534',
+                            borderRadius: 6,
+                            padding: '2px 8px',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {p.donor_serial}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: '#111827',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {p.donor_name}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#15803d', flexShrink: 0 }}>
+                        {formatMoney(p.amount)}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#6b7280' }}>{p.donor_address}</div>
+                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
+                      {formatDate(p.payment_date)} · {p.collector_name}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    key={p.id}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '60px 1fr 1fr 120px 140px 110px',
+                      gap: 8,
+                      padding: '12px 20px',
+                      alignItems: 'center',
+                      background: idx % 2 === 0 ? '#ffffff' : '#f9fafb',
+                      borderBottom: '1px solid #f3f4f6',
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: '#dcfce7',
+                        color: '#166534',
+                        borderRadius: 6,
+                        padding: '2px 0',
+                        textAlign: 'center',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        width: 48,
+                      }}
+                    >
+                      {p.donor_serial}
+                    </span>
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: '#111827',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {p.donor_name}
+                    </span>
+                    <span
+                      style={{
+                        color: '#6b7280',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {p.donor_address}
+                    </span>
+                    <span
+                      style={{
+                        color: '#374151',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {p.collector_name}
+                    </span>
+                    <span style={{ color: '#374151' }}>{formatDate(p.payment_date)}</span>
+                    <span style={{ textAlign: 'right', fontWeight: 700, color: '#15803d' }}>
+                      {formatMoney(p.amount)}
+                    </span>
+                  </div>
+                )
               )}
             </div>
           </div>

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { RECORD_PAYMENT_MUTATION } from '../graphql/mutations';
-import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY, DONOR_PAYMENTS_QUERY } from '../graphql/queries';
 import { useIsMobile } from '../context/MobileContext';
+import PaymentHistory from '../components/PaymentHistory';
 
 function formatMoney(value) {
   return new Intl.NumberFormat('bn-BD', {
@@ -139,6 +140,7 @@ export default function Donations() {
         refetchQueries: [
           { query: DONORS_QUERY, variables },
           { query: DASHBOARD_SUMMARY_QUERY },
+          { query: DONOR_PAYMENTS_QUERY, variables: { donorId: selectedDonor.id } },
         ],
         awaitRefetchQueries: true,
       });
@@ -620,6 +622,10 @@ export default function Donations() {
                   {paymentState.loading ? 'সংরক্ষণ হচ্ছে...' : 'চাঁদা গ্রহণ করুন'}
                 </button>
               </form>
+
+              <div style={{ marginTop: 20 }}>
+                <PaymentHistory donorId={selectedDonor.id} />
+              </div>
             </div>
           </div>
         </div>
