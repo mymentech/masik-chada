@@ -30,6 +30,12 @@ function bootstrap(): Promise<void> {
       (configService.get<string>('NODE_ENV') || '').toLowerCase() === 'production';
     const allowedOrigins = getStringList(configService, 'CORS_ALLOWED_ORIGINS');
 
+    // Vercel sets VERCEL_URL to the deployment's own hostname (no protocol).
+    // Always allow same-deployment requests so the bundled frontend can reach the API.
+    const vercelOrigin = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : null;
+
     nestApp.enableCors({
       origin: (
         origin: string | undefined,
@@ -39,7 +45,12 @@ function bootstrap(): Promise<void> {
           callback(null, true);
           return;
         }
-        if (!isProduction || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        if (
+          !isProduction ||
+          allowedOrigins.length === 0 ||
+          allowedOrigins.includes(origin) ||
+          (vercelOrigin !== null && origin === vercelOrigin)
+        ) {
           callback(null, true);
           return;
         }
@@ -57,6 +68,15 @@ function bootstrap(): Promise<void> {
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  await bootstrap();
+  try {
+    await bootstrap();
+  } catch (err) {
+    // Reset so the next cold start retries rather than serving the same failure forever.
+    appReady = undefined;
+    console.error('[serverless] bootstrap failed:', err);
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ errors: [{ message: 'Service unavailable — check function logs' }] }));
+    return;
+  }
   expressServer(req as express.Request, res as express.Response);
 }
