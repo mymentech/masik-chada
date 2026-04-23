@@ -1,6 +1,11 @@
 {
   "version": 2,
   "name": "masik_chada",
+  "build": {
+    "env": {
+      "NODE_VERSION": "20"
+    }
+  },
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "echo 'deps installed per sub-project'",
