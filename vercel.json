@@ -5,14 +5,14 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "echo 'deps installed per sub-project'",
   "functions": {
-    "backend/api/index.js": {
+    "api/index.js": {
       "memory": 512,
       "maxDuration": 30
     }
   },
   "rewrites": [
-    { "source": "/graphql",       "destination": "/backend/api/index.js" },
-    { "source": "/health/:path*", "destination": "/backend/api/index.js" },
+    { "source": "/graphql",       "destination": "/api/index.js" },
+    { "source": "/health/:path*", "destination": "/api/index.js" },
     { "source": "/:path*",        "destination": "/index.html" }
   ]
 }
