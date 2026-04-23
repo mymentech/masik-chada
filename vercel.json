@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "masik_chada",
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "echo 'deps installed per sub-project'",
