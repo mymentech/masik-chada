@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ME_QUERY } from '../graphql/queries';
 import { CHANGE_PASSWORD_MUTATION, UPDATE_PROFILE_MUTATION } from '../graphql/mutations';
 import { useAuth } from '../context/AuthContext';
@@ -67,7 +68,8 @@ function Feedback({ notice }) {
 
 export default function Profile() {
   const isMobile = useIsMobile();
-  const { user: authUser, login: setAuth, token } = useAuth();
+  const navigate = useNavigate();
+  const { user: authUser, login: setAuth, token, logout } = useAuth();
   const { data, loading } = useQuery(ME_QUERY, { fetchPolicy: 'cache-and-network' });
   const me = data?.me;
 
@@ -138,6 +140,11 @@ export default function Profile() {
     }
   }
 
+  function logoutFromProfile() {
+    logout();
+    navigate('/login', { replace: true });
+  }
+
   return (
     <div style={{ background: '#f9fafb', minHeight: '100svh', padding: isMobile ? '16px' : '24px 0' }}>
       <div className={isMobile ? '' : 'container'} style={{ display: 'grid', gap: 20, maxWidth: 820 }}>
@@ -182,6 +189,25 @@ export default function Profile() {
               সেটিংস
             </Link>
           </div>
+        )}
+
+        {isMobile && (
+          <button
+            type="button"
+            onClick={logoutFromProfile}
+            style={{
+              height: 44,
+              border: 0,
+              borderRadius: 12,
+              background: '#eef2ff',
+              color: '#4f46e5',
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+          >
+            লগআউট
+          </button>
         )}
 
         {loading && !me ? (

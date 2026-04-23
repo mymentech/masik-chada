@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { Payment } from '../payments/entities/payment.entity';
 import { User, UserRole } from './entities/user.entity';
 import {
   AdminUpdateUserInput,
@@ -12,7 +13,10 @@ import {
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
+  ) {}
 
   findByEmail(email: string) {
     return this.userRepo
@@ -72,13 +76,42 @@ export class UsersService {
     return (await this.userRepo.findOne({ where: { id: user.id } }))!;
   }
 
-  async deleteUser(id: string, actingUserId: string): Promise<boolean> {
+  async deleteUser(id: string, actingUserId: string, reassignToUserId: string): Promise<boolean> {
     if (String(id) === String(actingUserId)) {
       throw new BadRequestException('You cannot delete your own account');
     }
-    const user = await this.userRepo.findOne({ where: { id: Number(id) } });
-    if (!user) throw new NotFoundException('User not found');
-    await this.userRepo.delete(user.id);
+    if (String(id) === String(reassignToUserId)) {
+      throw new BadRequestException('Replacement user must be different from deleted user');
+    }
+
+    const deletedUserId = Number(id);
+    const replacementId = Number(reassignToUserId);
+    if (!Number.isInteger(deletedUserId) || deletedUserId <= 0) {
+      throw new BadRequestException('Invalid user id');
+    }
+    if (!Number.isInteger(replacementId) || replacementId <= 0) {
+      throw new BadRequestException('Invalid replacement user id');
+    }
+
+    await this.userRepo.manager.transaction(async (manager) => {
+      const txUserRepo = manager.getRepository(User);
+      const txPaymentRepo = manager.getRepository(Payment);
+
+      const [targetUser, replacementUser] = await Promise.all([
+        txUserRepo.findOne({ where: { id: deletedUserId } }),
+        txUserRepo.findOne({ where: { id: replacementId } }),
+      ]);
+
+      if (!targetUser) throw new NotFoundException('User not found');
+      if (!replacementUser) throw new NotFoundException('Replacement user not found');
+      if (targetUser.id === replacementUser.id) {
+        throw new BadRequestException('Replacement user must be different from deleted user');
+      }
+
+      await txPaymentRepo.update({ collector_id: targetUser.id }, { collector_id: replacementUser.id });
+      await txUserRepo.delete(targetUser.id);
+    });
+
     return true;
   }
 

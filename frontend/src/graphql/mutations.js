@@ -121,8 +121,8 @@ export const ADMIN_RESET_PASSWORD_MUTATION = gql`
 `;
 
 export const ADMIN_DELETE_USER_MUTATION = gql`
-  mutation AdminDeleteUser($id: String!) {
-    adminDeleteUser(id: $id)
+  mutation AdminDeleteUser($id: String!, $reassignToUserId: String!) {
+    adminDeleteUser(id: $id, reassignToUserId: $reassignToUserId)
   }
 `;
 

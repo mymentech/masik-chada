@@ -181,8 +181,9 @@ export class AppResolver {
   adminDeleteUser(
     @CurrentUser() user: AuthContextUser,
     @Args('id') id: string,
+    @Args('reassignToUserId') reassignToUserId: string,
   ): Promise<boolean> {
-    return this.usersService.deleteUser(id, user.userId);
+    return this.usersService.deleteUser(id, user.userId, reassignToUserId);
   }
 
   @Roles(UserRole.Admin)

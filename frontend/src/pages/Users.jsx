@@ -89,6 +89,8 @@ export default function Users() {
   const [editing, setEditing] = useState(null);
   const [creating, setCreating] = useState(false);
   const [resetting, setResetting] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [reassignToUserId, setReassignToUserId] = useState('');
   const [notice, setNotice] = useState({ type: '', text: '' });
 
   const [createUser, createState] = useMutation(CREATE_USER_MUTATION);
@@ -164,18 +166,35 @@ export default function Users() {
     }
   }
 
-  async function handleDelete(u) {
-    if (!window.confirm(`${u.name} কে মুছে ফেলতে চান?`)) return;
+  function openDeleteFlow(u) {
+    const candidates = users.filter(
+      (row) => String(row.id) !== String(u.id) && String(row.id) !== String(me?.id),
+    );
+    if (candidates.length === 0) {
+      setNotice({
+        type: 'error',
+        text: 'At least one other user is required to reassign payment records before deletion.',
+      });
+      return;
+    }
+    setDeleteTarget(u);
+    setReassignToUserId(String(candidates[0].id));
+  }
+
+  async function confirmDeleteUser() {
+    if (!deleteTarget || !reassignToUserId) return;
     setNotice({ type: '', text: '' });
     try {
       await adminDelete({
-        variables: { id: u.id },
+        variables: { id: deleteTarget.id, reassignToUserId },
         refetchQueries: [{ query: USERS_QUERY }],
         awaitRefetchQueries: true,
       });
-      setNotice({ type: 'success', text: 'ইউজার মুছে ফেলা হয়েছে।' });
+      setDeleteTarget(null);
+      setReassignToUserId('');
+      setNotice({ type: 'success', text: 'User deleted and related payment records were reassigned successfully.' });
     } catch (err) {
-      setNotice({ type: 'error', text: err?.graphQLErrors?.[0]?.message || 'ডিলিট ব্যর্থ।' });
+      setNotice({ type: 'error', text: err?.graphQLErrors?.[0]?.message || 'Delete failed.' });
     }
   }
 
@@ -261,7 +280,7 @@ export default function Users() {
                   <button type="button" onClick={() => setEditing(u)} style={{ background: '#dbeafe', color: '#2563eb', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>এডিট</button>
                   <button type="button" onClick={() => setResetting(u)} style={{ background: '#fef3c7', color: '#92400e', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>পাসওয়ার্ড রিসেট</button>
                   {String(me?.id) !== String(u.id) && (
-                    <button type="button" onClick={() => handleDelete(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
+                    <button type="button" onClick={() => openDeleteFlow(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
                   )}
                 </div>
               </div>
@@ -287,7 +306,7 @@ export default function Users() {
                   <button type="button" onClick={() => setEditing(u)} style={{ background: '#dbeafe', color: '#2563eb', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>এডিট</button>
                   <button type="button" onClick={() => setResetting(u)} style={{ background: '#fef3c7', color: '#92400e', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>রিসেট</button>
                   {String(me?.id) !== String(u.id) && (
-                    <button type="button" onClick={() => handleDelete(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
+                    <button type="button" onClick={() => openDeleteFlow(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
                   )}
                 </span>
               </div>
@@ -369,6 +388,58 @@ export default function Users() {
           </form>
         )}
       </Sheet>
+      <Sheet
+        open={Boolean(deleteTarget)}
+        onClose={() => {
+          setDeleteTarget(null);
+          setReassignToUserId('');
+        }}
+        title={`Delete User � ${deleteTarget?.name || ''}`}
+      >
+        {deleteTarget && (
+          <div style={{ display: 'grid', gap: 12 }}>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: 13, lineHeight: 1.6 }}>
+              Reassign this user's payment records to another user before deleting the account.
+            </p>
+            <div>
+              <label style={labelStyle}>Reassign Payments To</label>
+              <select
+                value={reassignToUserId}
+                onChange={(e) => setReassignToUserId(e.target.value)}
+                className="ds-input"
+                style={inputStyle}
+              >
+                {users
+                  .filter((row) => String(row.id) !== String(deleteTarget.id) && String(row.id) !== String(me?.id))
+                  .map((row) => (
+                    <option key={row.id} value={row.id}>
+                      {row.name} ({row.email})
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <button
+              type="button"
+              disabled={!reassignToUserId}
+              onClick={confirmDeleteUser}
+              style={{
+                height: 44,
+                background: '#ef4444',
+                color: '#fff',
+                border: 0,
+                borderRadius: 10,
+                fontWeight: 600,
+                cursor: !reassignToUserId ? 'not-allowed' : 'pointer',
+                fontSize: 14,
+                opacity: !reassignToUserId ? 0.6 : 1,
+              }}
+            >
+              Reassign and Delete User
+            </button>
+          </div>
+        )}
+      </Sheet>
     </div>
   );
 }
+
