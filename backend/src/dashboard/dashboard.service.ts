@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Payment, PaymentDocument } from '../payments/schemas/payment.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Payment } from '../payments/entities/payment.entity';
 import { monthBounds } from '../utils/calculate-dues';
 import { DonorsService } from '../donors/donors.service';
 import { DashboardSummary } from './dashboard.type';
@@ -10,7 +10,7 @@ import { DashboardSummary } from './dashboard.type';
 export class DashboardService {
   constructor(
     private readonly donorsService: DonorsService,
-    @InjectModel(Payment.name) private readonly paymentModel: Model<PaymentDocument>,
+    @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
   ) {}
 
   async summary(): Promise<DashboardSummary> {
@@ -18,25 +18,16 @@ export class DashboardService {
     const totalBalance = Number((await this.donorsService.totalBalance()).toFixed(2));
 
     const { start, end } = monthBounds();
-    const monthRows = await this.paymentModel
-      .aggregate<{ total: number; collectors: string[] }>([
-        {
-          $match: {
-            payment_date: { $gte: start, $lte: end },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: '$amount' },
-            collectors: { $addToSet: '$collector_id' },
-          },
-        },
-      ])
-      .exec();
 
-    const thisMonthCollected = Number((monthRows[0]?.total || 0).toFixed(2));
-    const totalCollectors = monthRows[0]?.collectors?.length || 0;
+    const result = await this.paymentRepo
+      .createQueryBuilder('p')
+      .select('SUM(p.amount)', 'total')
+      .addSelect('COUNT(DISTINCT p.collector_id)', 'collectors')
+      .where('p.payment_date >= :start AND p.payment_date <= :end', { start, end })
+      .getRawOne<{ total: string | null; collectors: string }>();
+
+    const thisMonthCollected = Number((Number(result?.total || 0)).toFixed(2));
+    const totalCollectors = Number(result?.collectors || 0);
 
     return {
       totalDonors,

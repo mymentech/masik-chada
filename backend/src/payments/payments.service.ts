@@ -1,45 +1,55 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Donor, DonorDocument } from '../donors/schemas/donor.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Donor } from '../donors/entities/donor.entity';
 import { monthBounds } from '../utils/calculate-dues';
-import { Payment, PaymentDocument } from './schemas/payment.schema';
+import { Payment } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentsService {
   constructor(
-    @InjectModel(Payment.name) private readonly paymentModel: Model<PaymentDocument>,
-    @InjectModel(Donor.name) private readonly donorModel: Model<DonorDocument>,
+    @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
+    @InjectRepository(Donor) private readonly donorRepo: Repository<Donor>,
   ) {}
 
   async payments(month?: string): Promise<Payment[]> {
-    const filter: Record<string, unknown> = {};
+    const qb = this.paymentRepo
+      .createQueryBuilder('p')
+      .orderBy('p.payment_date', 'DESC');
+
     if (month) {
       const { start, end } = monthBounds(month);
-      filter.payment_date = { $gte: start, $lte: end };
+      qb.where('p.payment_date >= :start AND p.payment_date <= :end', { start, end });
     }
 
-    const payments = await this.paymentModel.find(filter).sort({ payment_date: -1 }).exec();
-    return payments;
+    return qb.getMany();
   }
 
   async donorPayments(donorId: string): Promise<Payment[]> {
-    if (!Types.ObjectId.isValid(donorId)) {
+    const id = Number(donorId);
+    if (!Number.isInteger(id) || id <= 0) {
       throw new BadRequestException('Invalid donor id');
     }
 
-    return this.paymentModel
-      .find({ donor_id: new Types.ObjectId(donorId) })
-      .sort({ payment_date: -1 })
-      .exec();
+    return this.paymentRepo
+      .createQueryBuilder('p')
+      .where('p.donor_id = :donorId', { donorId: id })
+      .orderBy('p.payment_date', 'DESC')
+      .getMany();
   }
 
-  async recordPayment(donorId: string, amount: number, paymentDate: string, collectorId: string): Promise<Payment> {
-    if (!Types.ObjectId.isValid(donorId)) {
+  async recordPayment(
+    donorId: string,
+    amount: number,
+    paymentDate: string,
+    collectorId: string,
+  ): Promise<Payment> {
+    const id = Number(donorId);
+    if (!Number.isInteger(id) || id <= 0) {
       throw new BadRequestException('Invalid donor id');
     }
 
-    const donor = await this.donorModel.findById(donorId).lean().exec();
+    const donor = await this.donorRepo.findOne({ where: { id } });
     if (!donor) {
       throw new NotFoundException('Donor not found');
     }
@@ -53,36 +63,27 @@ export class PaymentsService {
       throw new BadRequestException('paymentDate must be a valid date string');
     }
 
-    const payment = await this.paymentModel.create({
-      donor_id: new Types.ObjectId(donorId),
-      collector_id: new Types.ObjectId(collectorId),
+    const payment = this.paymentRepo.create({
+      donor_id: id,
+      collector_id: Number(collectorId),
       amount,
       payment_date: parsedPaymentDate,
     });
 
-    return payment;
+    return this.paymentRepo.save(payment);
   }
 
   async monthCollectedTotal(month?: string): Promise<number> {
-    const match: Record<string, unknown> = {};
+    const qb = this.paymentRepo
+      .createQueryBuilder('p')
+      .select('SUM(p.amount)', 'total');
 
     if (month) {
       const { start, end } = monthBounds(month);
-      match.payment_date = { $gte: start, $lte: end };
+      qb.where('p.payment_date >= :start AND p.payment_date <= :end', { start, end });
     }
 
-    const result = await this.paymentModel
-      .aggregate<{ total: number }>([
-        { $match: match },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: '$amount' },
-          },
-        },
-      ])
-      .exec();
-
-    return Number((result[0]?.total || 0).toFixed(2));
+    const result = await qb.getRawOne<{ total: string | null }>();
+    return Number((Number(result?.total || 0)).toFixed(2));
   }
 }

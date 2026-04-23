@@ -5,3 +5,8 @@ frontend/node_modules/
 frontend/dist/
 dbdata/
 *.log
+
+# Sensitive / generated – do not commit
+supabase.txt
+u947130940_subscription.sql
+scripts/supabase-data.sql

@@ -6,12 +6,8 @@ describe('HealthService', () => {
     const service = new HealthService(
       {
         get: vi.fn((key: string) => {
-          if (key === 'MONGO_URI') {
-            return 'mongodb://localhost:27017/masik';
-          }
-          if (key === 'JWT_SECRET') {
-            return 'secret';
-          }
+          if (key === 'DATABASE_URL') return 'postgresql://localhost/masik';
+          if (key === 'JWT_SECRET') return 'secret';
           return undefined;
         }),
       } as never,
@@ -19,12 +15,8 @@ describe('HealthService', () => {
         isRegistrationHealthy: vi.fn().mockReturnValue(true),
       } as never,
       {
-        readyState: 1,
-        db: {
-          admin: vi.fn().mockReturnValue({
-            ping: vi.fn().mockResolvedValue({ ok: 1 }),
-          }),
-        },
+        isInitialized: true,
+        query: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
       } as never,
     );
 
@@ -39,16 +31,12 @@ describe('HealthService', () => {
     });
   });
 
-  it('reports not_ready when db ping fails or scheduler is not armed', async () => {
+  it('reports not_ready when db query fails or scheduler is not armed', async () => {
     const service = new HealthService(
       {
         get: vi.fn((key: string) => {
-          if (key === 'MONGO_URI') {
-            return 'mongodb://localhost:27017/masik';
-          }
-          if (key === 'JWT_SECRET') {
-            return 'secret';
-          }
+          if (key === 'DATABASE_URL') return 'postgresql://localhost/masik';
+          if (key === 'JWT_SECRET') return 'secret';
           return undefined;
         }),
       } as never,
@@ -56,12 +44,8 @@ describe('HealthService', () => {
         isRegistrationHealthy: vi.fn().mockReturnValue(false),
       } as never,
       {
-        readyState: 1,
-        db: {
-          admin: vi.fn().mockReturnValue({
-            ping: vi.fn().mockRejectedValue(new Error('down')),
-          }),
-        },
+        isInitialized: true,
+        query: vi.fn().mockRejectedValue(new Error('down')),
       } as never,
     );
 
@@ -72,5 +56,28 @@ describe('HealthService', () => {
         cron: { status: 'fail' },
       },
     });
+  });
+
+  it('reports db fail when dataSource is not initialized', async () => {
+    const service = new HealthService(
+      {
+        get: vi.fn((key: string) => {
+          if (key === 'DATABASE_URL') return 'postgresql://localhost/masik';
+          if (key === 'JWT_SECRET') return 'secret';
+          return undefined;
+        }),
+      } as never,
+      {
+        isRegistrationHealthy: vi.fn().mockReturnValue(true),
+      } as never,
+      {
+        isInitialized: false,
+        query: vi.fn(),
+      } as never,
+    );
+
+    const result = await service.ready();
+    expect(result.checks.db.status).toBe('fail');
+    expect(result.status).toBe('not_ready');
   });
 });

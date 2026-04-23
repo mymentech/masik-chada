@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectConnection } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { MonthlySnapshotScheduler } from '../jobs/monthly-snapshot.scheduler';
-import { getBoolean } from '../common/config/runtime-config';
 import { LivenessResponse, ReadinessResponse } from './health.types';
 
 const SERVICE_NAME = 'masik-backend';
@@ -13,7 +12,7 @@ export class HealthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly monthlySnapshotScheduler: MonthlySnapshotScheduler,
-    @InjectConnection() private readonly connection: Connection,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   live(): LivenessResponse {
@@ -52,18 +51,18 @@ export class HealthService {
   }
 
   private hasRequiredConfig(): boolean {
-    const mongoUri = this.configService.get<string>('MONGO_URI');
+    const dbUrl = this.configService.get<string>('DATABASE_URL');
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
-    return Boolean(mongoUri?.trim() && jwtSecret?.trim());
+    return Boolean(dbUrl?.trim() && jwtSecret?.trim());
   }
 
   private async isDatabaseReady(): Promise<boolean> {
-    if (this.connection.readyState !== 1) {
+    if (!this.dataSource.isInitialized) {
       return false;
     }
 
     try {
-      await this.connection.db?.admin().ping();
+      await this.dataSource.query('SELECT 1');
       return true;
     } catch {
       return false;

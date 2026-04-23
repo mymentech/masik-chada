@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { DashboardSummary } from '../../dashboard/dashboard.type';
 import { DonorBalance } from '../../donors/dto/donor-balance.type';
-import { Payment } from '../schemas/payment.schema';
+import { Payment } from '../entities/payment.entity';
 
 @ObjectType()
 export class RecordPaymentResult {

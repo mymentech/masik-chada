@@ -1,19 +1,4 @@
 services:
-  masik_db:
-    image: mongo:7
-    container_name: masik_db
-    restart: unless-stopped
-    volumes:
-      - ./dbdata:/data/db
-    networks:
-      - mymentech
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
   masik_backend:
     build:
       context: ./backend
@@ -21,7 +6,8 @@ services:
     restart: unless-stopped
     environment:
       PORT: ${PORT:-5000}
-      MONGO_URI: ${MONGO_URI:-mongodb://masik_db:27017/masik_db}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL (Supabase connection string) in the host environment}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the host environment before deployment}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       JWT_ISSUER: ${JWT_ISSUER:-subscription.mymentech.com}
@@ -37,9 +23,6 @@ services:
       AUTH_LOGIN_WINDOW_MS: ${AUTH_LOGIN_WINDOW_MS:-900000}
       AUTH_LOGIN_LOCK_MS: ${AUTH_LOGIN_LOCK_MS:-900000}
       AUTH_LOGIN_FAILED_DELAY_MS: ${AUTH_LOGIN_FAILED_DELAY_MS:-250}
-    depends_on:
-      masik_db:
-        condition: service_healthy
     networks:
       - mymentech
 

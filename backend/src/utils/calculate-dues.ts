@@ -39,9 +39,13 @@ export function calculateOutstandingBalance(totalDue: number, totalPaid: number)
   return Number((totalDue - totalPaid).toFixed(2));
 }
 
-export function toIsoDate(value: Date | null | undefined): string | undefined {
+export function toIsoDate(value: Date | string | null | undefined): string | undefined {
   if (!value) {
     return undefined;
+  }
+
+  if (typeof value === 'string') {
+    return new Date(value).toISOString();
   }
 
   return value.toISOString();

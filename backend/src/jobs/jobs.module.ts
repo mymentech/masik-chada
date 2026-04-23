@@ -1,25 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Donor, DonorSchema } from '../donors/schemas/donor.schema';
-import { Payment, PaymentSchema } from '../payments/schemas/payment.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Donor } from '../donors/entities/donor.entity';
+import { Payment } from '../payments/entities/payment.entity';
+import { MonthlyDonorSnapshot } from './entities/monthly-donor-snapshot.entity';
+import { MonthlyJobRun } from './entities/monthly-job-run.entity';
 import { MonthlySnapshotScheduler } from './monthly-snapshot.scheduler';
 import { MonthlySnapshotService } from './monthly-snapshot.service';
-import {
-  MonthlyDonorSnapshot,
-  MonthlyDonorSnapshotSchema,
-} from './schemas/monthly-donor-snapshot.schema';
-import { MonthlyJobRun, MonthlyJobRunSchema } from './schemas/monthly-job-run.schema';
 
 @Module({
   imports: [
     ConfigModule,
-    MongooseModule.forFeature([
-      { name: Donor.name, schema: DonorSchema },
-      { name: Payment.name, schema: PaymentSchema },
-      { name: MonthlyDonorSnapshot.name, schema: MonthlyDonorSnapshotSchema },
-      { name: MonthlyJobRun.name, schema: MonthlyJobRunSchema },
-    ]),
+    TypeOrmModule.forFeature([Donor, Payment, MonthlyDonorSnapshot, MonthlyJobRun]),
   ],
   providers: [MonthlySnapshotService, MonthlySnapshotScheduler],
   exports: [MonthlySnapshotService, MonthlySnapshotScheduler],

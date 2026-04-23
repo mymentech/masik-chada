@@ -1,61 +1,88 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Types, type PipelineStage } from 'mongoose';
-import { Counter, CounterDocument } from '../counters/schemas/counter.schema';
-import { Payment, PaymentDocument } from '../payments/schemas/payment.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Payment } from '../payments/entities/payment.entity';
 import { calculateOutstandingBalance, calculateTotalDue, monthBounds, toIsoDate } from '../utils/calculate-dues';
 import { DonorInput } from './dto/donor.input';
 import { DonorBalance, DonorsSummaryRow } from './dto/donor-balance.type';
-import { Donor, DonorDocument } from './schemas/donor.schema';
+import { Donor } from './entities/donor.entity';
 
 @Injectable()
 export class DonorsService {
   constructor(
-    @InjectModel(Donor.name) private readonly donorModel: Model<DonorDocument>,
-    @InjectModel(Payment.name) private readonly paymentModel: Model<PaymentDocument>,
-    @InjectModel(Counter.name) private readonly counterModel: Model<CounterDocument>,
+    @InjectRepository(Donor) private readonly donorRepo: Repository<Donor>,
+    @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async donors(search?: string, address?: string): Promise<DonorBalance[]> {
-    const filter: FilterQuery<DonorDocument> = {};
+    const qb = this.donorRepo.createQueryBuilder('d').orderBy('d.serial_number', 'ASC');
 
     if (address) {
-      filter.address = address;
+      qb.andWhere('d.address = :address', { address });
     }
 
     if (search) {
       const serial = Number(search);
       if (Number.isInteger(serial) && String(serial) === search.trim()) {
-        filter.$or = [{ serial_number: serial }, { name: { $regex: search.trim(), $options: 'i' } }];
+        qb.andWhere('(d.serial_number = :serial OR d.name ILIKE :searchPat)', {
+          serial,
+          searchPat: `%${search.trim()}%`,
+        });
       } else {
-        filter.name = { $regex: search.trim(), $options: 'i' };
+        qb.andWhere('d.name ILIKE :searchPat', { searchPat: `%${search.trim()}%` });
       }
     }
 
-    const donors = await this.donorModel.find(filter).sort({ serial_number: 1 }).lean().exec();
+    const donors = await qb.getMany();
     const paidMap = await this.paymentTotalsByDonor();
 
     return donors.map((donor) => this.toDonorBalance(donor, paidMap));
   }
 
   async donor(id: string): Promise<DonorBalance> {
-    const donor = await this.donorModel.findById(id).lean().exec();
+    const donor = await this.donorRepo.findOne({ where: { id: Number(id) } });
     if (!donor) {
       throw new NotFoundException('Donor not found');
     }
 
-    const paidMap = await this.paymentTotalsByDonor(new Types.ObjectId(id));
+    const paidMap = await this.paymentTotalsByDonor(Number(id));
     return this.toDonorBalance(donor, paidMap);
   }
 
   async addresses(): Promise<string[]> {
-    return this.donorModel.distinct('address').exec();
+    const rows = await this.donorRepo
+      .createQueryBuilder('d')
+      .select('DISTINCT d.address', 'address')
+      .orderBy('d.address', 'ASC')
+      .getRawMany<{ address: string }>();
+    return rows.map((r) => r.address);
   }
 
   async createDonor(input: DonorInput): Promise<DonorBalance> {
     const serial_number = await this.nextSerialNumber();
-    const donor = await this.donorModel.create({
-      serial_number,
+    const donor = await this.donorRepo.save(
+      this.donorRepo.create({
+        serial_number,
+        name: input.name.trim(),
+        phone: input.phone?.trim() || '+880',
+        address: input.address.trim(),
+        monthly_amount: input.monthly_amount,
+        registration_date: this.mustDate(input.registration_date, 'registration_date'),
+        due_from: input.due_from ? this.mustDate(input.due_from, 'due_from') : null,
+      }),
+    );
+
+    return this.toDonorBalance(donor, new Map());
+  }
+
+  async updateDonor(id: string, input: DonorInput): Promise<DonorBalance> {
+    const donor = await this.donorRepo.findOne({ where: { id: Number(id) } });
+    if (!donor) {
+      throw new NotFoundException('Donor not found');
+    }
+
+    await this.donorRepo.update(Number(id), {
       name: input.name.trim(),
       phone: input.phone?.trim() || '+880',
       address: input.address.trim(),
@@ -64,42 +91,19 @@ export class DonorsService {
       due_from: input.due_from ? this.mustDate(input.due_from, 'due_from') : null,
     });
 
-    return this.toDonorBalance(donor.toObject(), new Map());
-  }
-
-  async updateDonor(id: string, input: DonorInput): Promise<DonorBalance> {
-    const donor = await this.donorModel
-      .findByIdAndUpdate(
-        id,
-        {
-          name: input.name.trim(),
-          phone: input.phone?.trim() || '+880',
-          address: input.address.trim(),
-          monthly_amount: input.monthly_amount,
-          registration_date: this.mustDate(input.registration_date, 'registration_date'),
-          due_from: input.due_from ? this.mustDate(input.due_from, 'due_from') : null,
-        },
-        { new: true },
-      )
-      .lean()
-      .exec();
-
-    if (!donor) {
-      throw new NotFoundException('Donor not found');
-    }
-
-    const paidMap = await this.paymentTotalsByDonor(new Types.ObjectId(id));
-    return this.toDonorBalance(donor, paidMap);
+    const updated = await this.donorRepo.findOne({ where: { id: Number(id) } });
+    const paidMap = await this.paymentTotalsByDonor(Number(id));
+    return this.toDonorBalance(updated!, paidMap);
   }
 
   async deleteDonor(id: string) {
-    const donor = await this.donorModel.findById(id).exec();
+    const donor = await this.donorRepo.findOne({ where: { id: Number(id) } });
     if (!donor) {
       throw new NotFoundException('Donor not found');
     }
 
-    await this.paymentModel.deleteMany({ donor_id: donor._id }).exec();
-    await donor.deleteOne();
+    // Cascade delete handles payments via FK
+    await this.donorRepo.delete(Number(id));
 
     return {
       success: true,
@@ -120,87 +124,67 @@ export class DonorsService {
   }
 
   async totalBalance(asOf?: Date): Promise<number> {
-    const donors = await this.donorModel.find().lean().exec();
+    const donors = await this.donorRepo.find();
     if (donors.length === 0) {
       return 0;
     }
 
     const paidMap = await this.paymentTotalsByDonor(undefined, asOf);
     return donors.reduce((acc, donor) => {
-      const donorId = String(donor._id);
-      const totalPaid = paidMap.get(donorId) || 0;
+      const totalPaid = paidMap.get(donor.id) || 0;
       const totalDue = calculateTotalDue(donor, asOf || new Date());
       return acc + calculateOutstandingBalance(totalDue, totalPaid);
     }, 0);
   }
 
   async syncSerialCounterWithCurrentMax(): Promise<number> {
-    const max = await this.donorModel
-      .findOne()
-      .sort({ serial_number: -1 })
-      .select({ serial_number: 1 })
-      .lean()
-      .exec();
+    const result = await this.donorRepo
+      .createQueryBuilder('d')
+      .select('MAX(d.serial_number)', 'max')
+      .getRawOne<{ max: string | null }>();
+    const maxSerial = Number(result?.max || 0);
 
-    const maxSerial = Number(max?.serial_number || 0);
-
-    await this.counterModel
-      .updateOne(
-        { key: 'donor_serial' },
-        {
-          $set: { value: maxSerial },
-          $setOnInsert: { key: 'donor_serial' },
-        },
-        { upsert: true },
-      )
-      .exec();
+    await this.dataSource.query(
+      `SELECT setval('donor_serial_seq', GREATEST($1::bigint, 1))`,
+      [maxSerial],
+    );
 
     return maxSerial;
   }
 
   private async paymentTotalsByDonor(
-    donorId?: Types.ObjectId,
+    donorId?: number,
     asOf?: Date,
-  ): Promise<Map<string, number>> {
-    const match: Record<string, unknown> = {};
-    if (donorId) {
-      match.donor_id = donorId;
+  ): Promise<Map<number, number>> {
+    const qb = this.paymentRepo
+      .createQueryBuilder('p')
+      .select('p.donor_id', 'donor_id')
+      .addSelect('SUM(p.amount)', 'total')
+      .groupBy('p.donor_id');
+
+    if (donorId !== undefined) {
+      qb.where('p.donor_id = :donorId', { donorId });
     }
 
     if (asOf) {
-      match.payment_date = { $lte: asOf };
+      qb.andWhere('p.payment_date <= :asOf', { asOf });
     }
 
-    const pipeline: PipelineStage[] = [];
-    if (Object.keys(match).length > 0) {
-      pipeline.push({ $match: match });
-    }
-
-    pipeline.push({
-      $group: {
-        _id: '$donor_id',
-        total: { $sum: '$amount' },
-      },
-    });
-
-    const rows = await this.paymentModel.aggregate<{ _id: Types.ObjectId; total: number }>(pipeline).exec();
-    const map = new Map<string, number>();
-
+    const rows = await qb.getRawMany<{ donor_id: string; total: string }>();
+    const map = new Map<number, number>();
     rows.forEach((row) => {
-      map.set(String(row._id), Number(row.total || 0));
+      map.set(Number(row.donor_id), Number(row.total || 0));
     });
-
     return map;
   }
 
-  private toDonorBalance(donor: Donor & { _id?: Types.ObjectId }, paidMap: Map<string, number>): DonorBalance {
-    const donorId = String(donor._id || donor.id);
-    const total_paid = Number((paidMap.get(donorId) || 0).toFixed(2));
+  private toDonorBalance(donor: Donor, paidMap: Map<number, number>): DonorBalance {
+    const total_paid = Number((paidMap.get(donor.id) || 0).toFixed(2));
     const total_due = calculateTotalDue(donor);
     const balance = calculateOutstandingBalance(total_due, total_paid);
 
     return {
-      id: donorId,
+      id: String(donor.id),
       serial_number: donor.serial_number,
       name: donor.name,
       phone: donor.phone,
@@ -217,31 +201,10 @@ export class DonorsService {
   }
 
   private async nextSerialNumber(): Promise<number> {
-    const max = await this.donorModel.findOne().sort({ serial_number: -1 }).select({ serial_number: 1 }).lean().exec();
-    const maxSerial = Number(max?.serial_number || 0);
-
-    await this.counterModel
-      .findOneAndUpdate(
-        { key: 'donor_serial' },
-        {
-          $max: { value: maxSerial },
-          $setOnInsert: { key: 'donor_serial' },
-        },
-        { upsert: true, new: true },
-      )
-      .lean()
-      .exec();
-
-    const counter = await this.counterModel
-      .findOneAndUpdate({ key: 'donor_serial' }, { $inc: { value: 1 } }, { new: true })
-      .lean()
-      .exec();
-
-    if (!counter) {
-      throw new Error('Unable to allocate donor serial number');
-    }
-
-    return counter.value;
+    const result = await this.dataSource.query<[{ seq: string }]>(
+      `SELECT nextval('donor_serial_seq') AS seq`,
+    );
+    return Number(result[0].seq);
   }
 
   private mustDate(value: string, fieldName: string): Date {
@@ -249,7 +212,6 @@ export class DonorsService {
     if (Number.isNaN(parsed.getTime())) {
       throw new BadRequestException(`${fieldName} must be a valid date string`);
     }
-
     return parsed;
   }
 

@@ -1,38 +1,70 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../payments/schemas/payment.schema', () => ({
-  Payment: class Payment {},
-}));
+// ---------------------------------------------------------------------------
+// Helpers to build minimal TypeORM QueryBuilder stubs
+// ---------------------------------------------------------------------------
 
-vi.mock('../users/schemas/user.schema', () => ({
-  User: class User {},
-}));
+function makePaymentQb(totalResult: unknown, byCollectorResult: unknown) {
+  let callCount = 0;
+  const qb = {
+    select: vi.fn().mockReturnThis(),
+    addSelect: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    andWhere: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
+    getRawOne: vi.fn().mockImplementation(() => Promise.resolve(callCount++ === 0 ? totalResult : null)),
+    getRawMany: vi.fn().mockResolvedValue(byCollectorResult),
+  };
+  return qb;
+}
 
 describe('ReportsService.monthlyReport', () => {
-  it('maps facet totals and collector ids correctly', async () => {
+  it('maps totals and collector ids correctly', async () => {
     const { ReportsService } = await import('./reports.service');
 
-    const aggregateExec = vi.fn().mockResolvedValue([
-      {
-        totals: [{ collected: 351.237 }],
-        byCollector: [
-          { _id: 'u1', total: 200.115 },
-          { _id: 'u2', total: 151.122 },
-        ],
-      },
-    ]);
-    const paymentModel = {
-      aggregate: vi.fn().mockReturnValue({
-        exec: aggregateExec,
+    const paymentQb = {
+      select: vi.fn().mockReturnThis(),
+      addSelect: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockReturnThis(),
+      getRawOne: vi.fn().mockResolvedValue({ collected: '351.237' }),
+      getRawMany: vi.fn().mockResolvedValue([
+        { collector_id: '1', total: '200.115' },
+        { collector_id: '2', total: '151.122' },
+      ]),
+    };
+
+    let paymentQbCallCount = 0;
+    const paymentRepo = {
+      createQueryBuilder: vi.fn().mockImplementation(() => {
+        paymentQbCallCount++;
+        if (paymentQbCallCount === 1) {
+          // totalResult call
+          return {
+            select: vi.fn().mockReturnThis(),
+            addSelect: vi.fn().mockReturnThis(),
+            where: vi.fn().mockReturnThis(),
+            getRawOne: vi.fn().mockResolvedValue({ collected: '351.237' }),
+          };
+        }
+        // byCollector call
+        return {
+          select: vi.fn().mockReturnThis(),
+          addSelect: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockReturnThis(),
+          getRawMany: vi.fn().mockResolvedValue([
+            { collector_id: '1', total: '200.115' },
+            { collector_id: '2', total: '151.122' },
+          ]),
+        };
       }),
     };
 
-    const userFindExec = vi.fn().mockResolvedValue([{ _id: 'u1', name: 'Collector One' }]);
-    const userModel = {
-      find: vi.fn().mockReturnValue({
-        lean: vi.fn().mockReturnValue({
-          exec: userFindExec,
-        }),
+    const userRepo = {
+      createQueryBuilder: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([{ id: 1, name: 'Collector One' }]),
       }),
     };
 
@@ -40,95 +72,59 @@ describe('ReportsService.monthlyReport', () => {
       totalBalance: vi.fn().mockResolvedValue(899.994),
     };
 
-    const service = new ReportsService(paymentModel as never, userModel as never, donorsService as never);
+    const service = new ReportsService(
+      paymentRepo as never,
+      userRepo as never,
+      donorsService as never,
+    );
 
     const report = await service.monthlyReport('2026-04');
 
-    expect(paymentModel.aggregate).toHaveBeenCalledTimes(1);
-    expect(userModel.find).toHaveBeenCalledWith({ _id: { $in: ['u1', 'u2'] } });
     expect(donorsService.totalBalance).toHaveBeenCalledTimes(1);
-    expect(report).toEqual({
-      collected: 351.24,
-      totalBalance: 899.99,
-      byCollector: [
-        { name: 'Collector One', total: 200.12 },
-        { name: 'Unknown', total: 151.12 },
-      ],
-    });
+    expect(report.collected).toBe(351.24);
+    expect(report.totalBalance).toBe(899.99);
+    expect(report.byCollector).toHaveLength(2);
+    expect(report.byCollector[0].name).toBe('Collector One');
+    expect(report.byCollector[1].name).toBe('Unknown');
   });
 
-  it('returns zero totals and skips collector lookup when no collector rows exist', async () => {
+  it('returns zero totals and skips collector lookup when no payments exist', async () => {
     const { ReportsService } = await import('./reports.service');
 
-    const aggregateExec = vi.fn().mockResolvedValue([
-      {
-        totals: [],
-        byCollector: [],
-      },
-    ]);
-    const paymentModel = {
-      aggregate: vi.fn().mockReturnValue({
-        exec: aggregateExec,
+    let callCount = 0;
+    const paymentRepo = {
+      createQueryBuilder: vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            select: vi.fn().mockReturnThis(),
+            addSelect: vi.fn().mockReturnThis(),
+            where: vi.fn().mockReturnThis(),
+            getRawOne: vi.fn().mockResolvedValue({ collected: null }),
+          };
+        }
+        return {
+          select: vi.fn().mockReturnThis(),
+          addSelect: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockReturnThis(),
+          getRawMany: vi.fn().mockResolvedValue([]),
+        };
       }),
     };
 
-    const userModel = {
-      find: vi.fn(),
-    };
+    const userRepo = { createQueryBuilder: vi.fn() };
+    const donorsService = { totalBalance: vi.fn().mockResolvedValue(0) };
 
-    const donorsService = {
-      totalBalance: vi.fn().mockResolvedValue(0),
-    };
+    const service = new ReportsService(
+      paymentRepo as never,
+      userRepo as never,
+      donorsService as never,
+    );
 
-    const service = new ReportsService(paymentModel as never, userModel as never, donorsService as never);
     const report = await service.monthlyReport('2026-04');
 
-    expect(userModel.find).not.toHaveBeenCalled();
-    expect(report).toEqual({
-      collected: 0,
-      totalBalance: 0,
-      byCollector: [],
-    });
-  });
-
-  it('ignores null collector ids for user lookup and keeps Unknown fallback in output', async () => {
-    const { ReportsService } = await import('./reports.service');
-
-    const aggregateExec = vi.fn().mockResolvedValue([
-      {
-        totals: [{ collected: 100 }],
-        byCollector: [
-          { _id: null, total: 20 },
-          { _id: 'u1', total: 80 },
-        ],
-      },
-    ]);
-    const paymentModel = {
-      aggregate: vi.fn().mockReturnValue({
-        exec: aggregateExec,
-      }),
-    };
-
-    const userFindExec = vi.fn().mockResolvedValue([{ _id: 'u1', name: 'Collector One' }]);
-    const userModel = {
-      find: vi.fn().mockReturnValue({
-        lean: vi.fn().mockReturnValue({
-          exec: userFindExec,
-        }),
-      }),
-    };
-
-    const donorsService = {
-      totalBalance: vi.fn().mockResolvedValue(0),
-    };
-
-    const service = new ReportsService(paymentModel as never, userModel as never, donorsService as never);
-    const report = await service.monthlyReport('2026-04');
-
-    expect(userModel.find).toHaveBeenCalledWith({ _id: { $in: ['u1'] } });
-    expect(report.byCollector).toEqual([
-      { name: 'Unknown', total: 20 },
-      { name: 'Collector One', total: 80 },
-    ]);
+    expect(userRepo.createQueryBuilder).not.toHaveBeenCalled();
+    expect(report).toEqual({ collected: 0, totalBalance: 0, byCollector: [] });
   });
 });

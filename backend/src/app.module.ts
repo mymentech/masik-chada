@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { APP_GUARD } from '@nestjs/core';
@@ -18,14 +18,31 @@ import { ReportsModule } from './reports/reports.module';
 import { JobsModule } from './jobs/jobs.module';
 import { HealthModule } from './health/health.module';
 import { AppResolver } from './app.resolver';
+import { Donor } from './donors/entities/donor.entity';
+import { Payment } from './payments/entities/payment.entity';
+import { User } from './users/entities/user.entity';
+import { MonthlyDonorSnapshot } from './jobs/entities/monthly-donor-snapshot.entity';
+import { MonthlyJobRun } from './jobs/entities/monthly-job-run.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        uri: config.get<string>('MONGO_URI'),
+        type: 'postgres',
+        url: config.get<string>('DATABASE_URL'),
+        entities: [User, Donor, Payment, MonthlyDonorSnapshot, MonthlyJobRun],
+        synchronize: false,
+        ssl: config.get<string>('DATABASE_SSL') !== 'false'
+          ? { rejectUnauthorized: false }
+          : false,
+        // Keep the pool small in serverless environments (one container = one request)
+        extra: {
+          max: process.env.VERCEL ? 1 : 10,
+          connectionTimeoutMillis: 10_000,
+          idleTimeoutMillis: 30_000,
+        },
       }),
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
