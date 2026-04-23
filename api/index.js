@@ -1,9 +1,4 @@
 'use strict';
-/**
- * Vercel serverless function entry point (must live at /api/ in the project root).
- *
- * `npm run build` compiles backend/src/serverless.ts → backend/dist/serverless.js
- * before Vercel serves this file, so the require below always finds the
- * compiled output.
- */
-module.exports = require('../backend/dist/serverless').default;
+// The build step compiles + bundles backend/src/serverless.ts into this directory.
+// Using a co-located path so Vercel's nft file-tracer picks it up automatically.
+module.exports = require('./dist/serverless').default;
