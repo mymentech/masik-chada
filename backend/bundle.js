@@ -16,23 +16,34 @@ if (!fs.existsSync(entry)) {
   process.exit(1);
 }
 
+// NestJS uses try/require for optional peer features (websockets, microservices, etc.)
+// and we don't use them. Any import that fails to resolve gets marked external so the
+// bundle builds; at runtime NestJS's try/catch handles the missing modules.
+const markOptionalDepsExternal = {
+  name: 'mark-optional-deps-external',
+  setup(build) {
+    build.onResolve({ filter: /.*/ }, async (args) => {
+      if (args.kind === 'entry-point' || args.path.startsWith('.') || path.isAbsolute(args.path)) {
+        return null;
+      }
+      try {
+        require.resolve(args.path, { paths: [args.resolveDir] });
+        return null;
+      } catch {
+        return { path: args.path, external: true };
+      }
+    });
+  },
+};
+
 esbuild.build({
   entryPoints: [entry],
   bundle: true,
   platform: 'node',
   target: 'node20',
   outfile,
-  external: [
-    'pg-native',
-    '@nestjs/websockets/socket-module',
-    '@nestjs/microservices',
-    '@nestjs/microservices/microservices-module',
-    'cache-manager',
-    'class-validator',
-    'class-transformer',
-    '@fastify/static',
-    '@fastify/view',
-  ],
+  external: ['pg-native'],
   keepNames: true,
   logLevel: 'warning',
+  plugins: [markOptionalDepsExternal],
 }).catch(() => process.exit(1));
