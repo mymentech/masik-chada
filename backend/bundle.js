@@ -22,7 +22,17 @@ esbuild.build({
   platform: 'node',
   target: 'node20',
   outfile,
-  external: ['pg-native'],
+  external: [
+    'pg-native',
+    '@nestjs/websockets/socket-module',
+    '@nestjs/microservices',
+    '@nestjs/microservices/microservices-module',
+    'cache-manager',
+    'class-validator',
+    'class-transformer',
+    '@fastify/static',
+    '@fastify/view',
+  ],
   keepNames: true,
   logLevel: 'warning',
 }).catch(() => process.exit(1));
