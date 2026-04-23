@@ -11,6 +11,7 @@
   "installCommand": "echo 'deps installed per sub-project'",
   "functions": {
     "api/index.js": {
+      "includeFiles": "backend/dist/**",
       "memory": 512,
       "maxDuration": 30
     }
