@@ -130,6 +130,22 @@ export default function Reports() {
             </h1>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <label
+                htmlFor="report-month"
+                style={{
+                  position: 'absolute',
+                  width: 1,
+                  height: 1,
+                  padding: 0,
+                  margin: -1,
+                  overflow: 'hidden',
+                  clip: 'rect(0, 0, 0, 0)',
+                  whiteSpace: 'nowrap',
+                  border: 0,
+                }}
+              >
+                মাস নির্বাচন করুন
+              </label>
               <input
                 id="report-month"
                 type="month"
@@ -252,8 +268,11 @@ export default function Reports() {
                   boxShadow: '0 4px 14px rgba(22,101,52,0.2)',
                 }}
               >
-                <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.72)', fontWeight: 500 }}>
-                  এ মাসের মোট সংগ্রহ
+                <h2 style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.9)', fontWeight: 700 }}>
+                  মোট সংগ্রহ
+                </h2>
+                <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
+                  এ মাসের সংগ্রহ
                 </p>
                 <p
                   style={{
@@ -280,9 +299,9 @@ export default function Reports() {
                   boxShadow: '0 4px 14px rgba(239,68,68,0.15)',
                 }}
               >
-                <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>
+                <h2 style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.95)', fontWeight: 700 }}>
                   মোট বকেয়া
-                </p>
+                </h2>
                 <p
                   style={{
                     margin: '8px 0 0',
@@ -305,9 +324,9 @@ export default function Reports() {
                   boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
                 }}
               >
-                <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
+                <h2 style={{ margin: 0, fontSize: 14, color: '#4b5563', fontWeight: 700 }}>
                   সক্রিয় কালেক্টর
-                </p>
+                </h2>
                 <p
                   style={{
                     margin: '8px 0 0',

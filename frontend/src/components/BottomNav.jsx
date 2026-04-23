@@ -43,11 +43,21 @@ function IconChart({ color }) {
   );
 }
 
+function IconUser({ color }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  );
+}
+
 const tabs = [
   { to: '/dashboard', label: 'ড্যাশবোর্ড', Icon: IconDash },
-  { to: '/donations', label: 'চাঁদা সংগ্রহ', Icon: IconCoins },
+  { to: '/donations', label: 'চাঁদা', Icon: IconCoins },
   { to: '/donors', label: 'দাতা', Icon: IconUsers },
   { to: '/reports', label: 'রিপোর্ট', Icon: IconChart },
+  { to: '/profile', label: 'প্রোফাইল', Icon: IconUser },
 ];
 
 export default function BottomNav() {

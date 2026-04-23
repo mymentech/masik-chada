@@ -7,7 +7,7 @@ import {
   DELETE_DONOR_MUTATION,
   UPDATE_DONOR_MUTATION
 } from '../graphql/mutations';
-import { DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
 
 const queryVariables = { search: undefined, address: undefined };
 
@@ -44,6 +44,23 @@ function dashboardSummaryMock() {
   };
 }
 
+function appSettingsMock(allowDonorDelete = true) {
+  return {
+    request: {
+      query: APP_SETTINGS_QUERY
+    },
+    result: {
+      data: {
+        appSettings: {
+          __typename: 'AppSettingsType',
+          allow_donor_delete: allowDonorDelete,
+          updated_at: '2026-04-01T00:00:00.000Z'
+        }
+      }
+    }
+  };
+}
+
 const existingDonor = {
   __typename: 'DonorType',
   id: 'donor-1',
@@ -68,6 +85,7 @@ describe('Donors page', () => {
     const registrationDate = '2026-04-10';
 
     const mocks = [
+      appSettingsMock(),
       donorsQueryMock([]),
       {
         request: {
@@ -127,23 +145,24 @@ describe('Donors page', () => {
       </MockedProvider>
     );
 
-    expect(await screen.findByRole('heading', { name: 'ডোনার ম্যানেজমেন্ট' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('নাম'), { target: { value: 'নতুন ডোনার' } });
     fireEvent.change(screen.getByLabelText('ফোন'), { target: { value: '+8801700000000' } });
     fireEvent.change(screen.getByLabelText('ঠিকানা'), { target: { value: 'ঢাকা' } });
-    fireEvent.change(screen.getByLabelText('মাসিক টাকা'), { target: { value: '450' } });
-    fireEvent.change(screen.getByLabelText('রেজিস্ট্রেশন তারিখ'), {
+    fireEvent.change(screen.getByLabelText('মাসিক চাঁদা'), { target: { value: '450' } });
+    fireEvent.change(screen.getByLabelText('নিবন্ধনের তারিখ'), {
       target: { value: registrationDate }
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'যোগ করুন' }));
 
-    expect(await screen.findByText('নতুন ডোনার যোগ হয়েছে।')).toBeInTheDocument();
+    expect(await screen.findByText('নতুন দাতা যোগ হয়েছে।')).toBeInTheDocument();
   });
 
   it('updates a donor and shows success feedback', async () => {
     const mocks = [
+      appSettingsMock(),
       donorsQueryMock([existingDonor]),
       {
         request: {
@@ -194,14 +213,14 @@ describe('Donors page', () => {
       </MockedProvider>
     );
 
-    expect(await screen.findByRole('heading', { name: 'ডোনার ম্যানেজমেন্ট' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'এডিট' }));
 
     fireEvent.change(screen.getByLabelText('নাম'), { target: { value: 'আপডেটেড ডোনার' } });
     fireEvent.change(screen.getByLabelText('ফোন'), { target: { value: '+8801711111112' } });
     fireEvent.change(screen.getByLabelText('ঠিকানা'), { target: { value: 'চট্টগ্রাম' } });
-    fireEvent.change(screen.getByLabelText('মাসিক টাকা'), { target: { value: '550' } });
-    fireEvent.change(screen.getByLabelText('অ্যামনেস্টি তারিখ (ঐচ্ছিক)'), { target: { value: '2026-02-01' } });
+    fireEvent.change(screen.getByLabelText('মাসিক চাঁদা'), { target: { value: '550' } });
+    fireEvent.change(screen.getByLabelText(/বকেয়া গণনার তারিখ/), { target: { value: '2026-02-01' } });
 
     fireEvent.click(screen.getByRole('button', { name: 'আপডেট করুন' }));
 
@@ -212,6 +231,7 @@ describe('Donors page', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     const mocks = [
+      appSettingsMock(),
       donorsQueryMock([existingDonor]),
       {
         request: {
@@ -238,7 +258,7 @@ describe('Donors page', () => {
       </MockedProvider>
     );
 
-    expect(await screen.findByRole('heading', { name: 'ডোনার ম্যানেজমেন্ট' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'ডিলিট' }));
 
     expect(await screen.findByText('Donor and related payments deleted successfully')).toBeInTheDocument();

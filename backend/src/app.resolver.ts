@@ -3,6 +3,7 @@ import { AuthService } from './auth/auth.service';
 import { LoginResponse } from './auth/auth.types';
 import { CurrentUser, type AuthContextUser } from './common/decorators/current-user.decorator';
 import { Public } from './common/decorators/public.decorator';
+import { Roles } from './common/decorators/roles.decorator';
 import { DashboardService } from './dashboard/dashboard.service';
 import { DashboardSummary } from './dashboard/dashboard.type';
 import { DonorsService } from './donors/donors.service';
@@ -13,7 +14,15 @@ import { RecordPaymentResult } from './payments/dto/record-payment-result.type';
 import { PaymentsService } from './payments/payments.service';
 import { MonthlyReport } from './reports/monthly-report.type';
 import { ReportsService } from './reports/reports.service';
-import { User } from './users/entities/user.entity';
+import { AppSetting } from './settings/entities/app-setting.entity';
+import { SettingsService } from './settings/settings.service';
+import { User, UserRole } from './users/entities/user.entity';
+import {
+  AdminUpdateUserInput,
+  ChangePasswordInput,
+  CreateUserInput,
+  UpdateProfileInput,
+} from './users/dto/user.inputs';
 import { UsersService } from './users/users.service';
 import { MonthlySnapshotJobResult } from './jobs/dto/monthly-snapshot-job-result.type';
 import { MonthlySnapshotService } from './jobs/monthly-snapshot.service';
@@ -38,6 +47,7 @@ export class AppResolver {
     private readonly dashboardService: DashboardService,
     private readonly reportsService: ReportsService,
     private readonly monthlySnapshotService: MonthlySnapshotService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   @Query(() => User)
@@ -88,6 +98,17 @@ export class AppResolver {
     return this.donorsService.donorsSummary();
   }
 
+  @Query(() => AppSetting)
+  appSettings() {
+    return this.settingsService.get();
+  }
+
+  @Roles(UserRole.Admin)
+  @Query(() => [User])
+  users() {
+    return this.usersService.list();
+  }
+
   @Public()
   @Mutation(() => LoginResponse)
   login(
@@ -96,6 +117,80 @@ export class AppResolver {
     @Context() context: GraphqlRequestContext,
   ): Promise<LoginResponse> {
     return this.authService.login(email, password, this.extractClientIp(context));
+  }
+
+  @Public()
+  @Mutation(() => Boolean)
+  async requestPasswordReset(@Args('email') email: string): Promise<boolean> {
+    await this.authService.requestPasswordReset(email);
+    return true;
+  }
+
+  @Public()
+  @Mutation(() => Boolean)
+  async resetPassword(
+    @Args('token') token: string,
+    @Args('newPassword') newPassword: string,
+  ): Promise<boolean> {
+    await this.authService.resetPasswordWithToken(token, newPassword);
+    return true;
+  }
+
+  @Mutation(() => User)
+  updateProfile(
+    @CurrentUser() user: AuthContextUser,
+    @Args('input') input: UpdateProfileInput,
+  ): Promise<User> {
+    return this.usersService.updateProfile(user.userId, input);
+  }
+
+  @Mutation(() => Boolean)
+  async changePassword(
+    @CurrentUser() user: AuthContextUser,
+    @Args('input') input: ChangePasswordInput,
+  ): Promise<boolean> {
+    return this.usersService.changePassword(user.userId, input);
+  }
+
+  @Roles(UserRole.Admin)
+  @Mutation(() => User)
+  createUser(@Args('input') input: CreateUserInput): Promise<User> {
+    return this.usersService.createUser(input);
+  }
+
+  @Roles(UserRole.Admin)
+  @Mutation(() => User)
+  adminUpdateUser(
+    @Args('id') id: string,
+    @Args('input') input: AdminUpdateUserInput,
+  ): Promise<User> {
+    return this.usersService.adminUpdateUser(id, input);
+  }
+
+  @Roles(UserRole.Admin)
+  @Mutation(() => Boolean)
+  adminResetUserPassword(
+    @Args('id') id: string,
+    @Args('newPassword') newPassword: string,
+  ): Promise<boolean> {
+    return this.usersService.adminResetPassword(id, newPassword);
+  }
+
+  @Roles(UserRole.Admin)
+  @Mutation(() => Boolean)
+  adminDeleteUser(
+    @CurrentUser() user: AuthContextUser,
+    @Args('id') id: string,
+  ): Promise<boolean> {
+    return this.usersService.deleteUser(id, user.userId);
+  }
+
+  @Roles(UserRole.Admin)
+  @Mutation(() => AppSetting)
+  updateAppSettings(
+    @Args('allowDonorDelete') allowDonorDelete: boolean,
+  ): Promise<AppSetting> {
+    return this.settingsService.update({ allow_donor_delete: allowDonorDelete });
   }
 
   @Mutation(() => DonorBalance)
@@ -108,8 +203,13 @@ export class AppResolver {
     return this.donorsService.updateDonor(id, input);
   }
 
+  @Roles(UserRole.Admin)
   @Mutation(() => DeleteDonorResult)
-  deleteDonor(@Args('id') id: string): Promise<DeleteDonorResult> {
+  async deleteDonor(@Args('id') id: string): Promise<DeleteDonorResult> {
+    const settings = await this.settingsService.get();
+    if (!settings.allow_donor_delete) {
+      throw new Error('Donor deletion is disabled. Enable it from settings first.');
+    }
     return this.donorsService.deleteDonor(id);
   }
 
@@ -123,8 +223,11 @@ export class AppResolver {
     return this.recordPaymentAndRefresh(donorId, amount, paymentDate, user.userId);
   }
 
+  @Roles(UserRole.Admin)
   @Mutation(() => MonthlySnapshotJobResult)
-  runMonthlySnapshotJob(@Args('month', { nullable: true }) month?: string): Promise<MonthlySnapshotJobResult> {
+  runMonthlySnapshotJob(
+    @Args('month', { nullable: true }) month?: string,
+  ): Promise<MonthlySnapshotJobResult> {
     return this.monthlySnapshotService.runForMonth(month);
   }
 

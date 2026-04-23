@@ -14,19 +14,19 @@ export class Donor {
   id!: number;
 
   @Field(() => Int)
-  @Column({ unique: true })
+  @Column({ type: 'int', unique: true })
   serial_number!: number;
 
   @Field()
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string;
 
   @Field({ nullable: true })
-  @Column({ length: 255, default: '+880' })
+  @Column({ type: 'varchar', length: 255, default: '+880' })
   phone!: string;
 
   @Field()
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   address!: string;
 
   @Field(() => Float)

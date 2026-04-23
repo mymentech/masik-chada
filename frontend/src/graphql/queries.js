@@ -64,6 +64,40 @@ export const DONOR_PAYMENTS_QUERY = gql`
   }
 `;
 
+export const ME_QUERY = gql`
+  query Me {
+    me {
+      id
+      name
+      email
+      phone
+      role
+    }
+  }
+`;
+
+export const USERS_QUERY = gql`
+  query Users {
+    users {
+      id
+      name
+      email
+      phone
+      role
+      created_at
+    }
+  }
+`;
+
+export const APP_SETTINGS_QUERY = gql`
+  query AppSettings {
+    appSettings {
+      allow_donor_delete
+      updated_at
+    }
+  }
+`;
+
 export const MONTHLY_REPORT_QUERY = gql`
   query MonthlyReport($month: String!) {
     monthlyReport(month: $month) {

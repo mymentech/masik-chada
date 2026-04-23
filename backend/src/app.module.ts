@@ -5,11 +5,14 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
+import { PasswordResetToken } from './auth/entities/password-reset-token.entity';
 import { getBoolean, getNumber } from './common/config/runtime-config';
 import { createDepthLimitRule } from './common/graphql/depth-limit.rule';
 import { normalizeGraphqlErrorCode } from './common/graphql/error-code-map';
 import { createRequestLimitsPlugin } from './common/graphql/request-limits.plugin';
 import { GqlAuthGuard } from './common/guards/gql-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
+import { EmailModule } from './email/email.module';
 import { UsersModule } from './users/users.module';
 import { DonorsModule } from './donors/donors.module';
 import { PaymentsModule } from './payments/payments.module';
@@ -17,6 +20,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ReportsModule } from './reports/reports.module';
 import { JobsModule } from './jobs/jobs.module';
 import { HealthModule } from './health/health.module';
+import { SettingsModule } from './settings/settings.module';
+import { AppSetting } from './settings/entities/app-setting.entity';
 import { AppResolver } from './app.resolver';
 import { Donor } from './donors/entities/donor.entity';
 import { Payment } from './payments/entities/payment.entity';
@@ -32,7 +37,7 @@ import { MonthlyJobRun } from './jobs/entities/monthly-job-run.entity';
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.get<string>('DATABASE_URL'),
-        entities: [User, Donor, Payment, MonthlyDonorSnapshot, MonthlyJobRun],
+        entities: [User, Donor, Payment, MonthlyDonorSnapshot, MonthlyJobRun, AppSetting, PasswordResetToken],
         synchronize: false,
         ssl: config.get<string>('DATABASE_SSL') !== 'false'
           ? { rejectUnauthorized: false }
@@ -81,12 +86,14 @@ import { MonthlyJobRun } from './jobs/entities/monthly-job-run.entity';
       },
     }),
     AuthModule,
+    EmailModule,
     UsersModule,
     DonorsModule,
     PaymentsModule,
     DashboardModule,
     ReportsModule,
     JobsModule,
+    SettingsModule,
     HealthModule,
   ],
   providers: [
@@ -94,6 +101,10 @@ import { MonthlyJobRun } from './jobs/entities/monthly-job-run.entity';
     {
       provide: APP_GUARD,
       useClass: GqlAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

@@ -1,18 +1,35 @@
+import { useState } from 'react';
+import { useQuery } from '@apollo/client';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { ME_QUERY } from '../graphql/queries';
 import LogoMark from './LogoMark';
 
-const navItems = [
+const baseItems = [
   { to: '/dashboard', label: 'ড্যাশবোর্ড' },
   { to: '/donations', label: 'চাঁদা সংগ্রহ' },
   { to: '/donors', label: 'দাতা ম্যানেজমেন্ট' },
   { to: '/reports', label: 'রিপোর্ট' },
 ];
 
+const adminItems = [
+  { to: '/users', label: 'ইউজার' },
+  { to: '/settings', label: 'সেটিংস' },
+];
+
 export default function Navbar() {
-  const { logout, user } = useAuth();
+  const { logout, user, isAuthenticated } = useAuth();
+  const { data } = useQuery(ME_QUERY, {
+    skip: !isAuthenticated,
+    fetchPolicy: 'cache-and-network',
+  });
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const activeUser = data?.me || user;
+  const isAdmin = String(activeUser?.role || '').toLowerCase() === 'admin';
+  const navItems = isAdmin ? [...baseItems, ...adminItems] : baseItems;
 
   return (
     <header className="topbar">
@@ -58,8 +75,23 @@ export default function Navbar() {
         </nav>
 
         {/* User section */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, position: 'relative' }}>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            onBlur={() => setTimeout(() => setMenuOpen(false), 120)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+          >
             <div
               style={{
                 width: 36,
@@ -72,30 +104,75 @@ export default function Navbar() {
                 flexShrink: 0,
               }}
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#16a34a"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
               </svg>
             </div>
-            {user?.name && (
-              <div>
+            {activeUser?.name && (
+              <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', lineHeight: 1.2 }}>
-                  {user.name}
+                  {activeUser.name}
                 </div>
-                <div style={{ fontSize: 11, color: '#9ca3af', lineHeight: 1.2 }}>অ্যাডমিন</div>
+                <div style={{ fontSize: 11, color: '#9ca3af', lineHeight: 1.2 }}>
+                  {isAdmin ? 'অ্যাডমিন' : 'কালেক্টর'}
+                </div>
               </div>
             )}
-          </div>
+          </button>
+
+          {menuOpen && (
+            <div
+              role="menu"
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 'calc(100% + 8px)',
+                background: '#ffffff',
+                border: '1px solid #f3f4f6',
+                borderRadius: 12,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                minWidth: 180,
+                padding: 6,
+                zIndex: 30,
+              }}
+            >
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); navigate('/profile'); setMenuOpen(false); }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#374151', cursor: 'pointer' }}
+              >
+                আমার প্রোফাইল
+              </button>
+              {isAdmin && (
+                <>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => { e.preventDefault(); navigate('/users'); setMenuOpen(false); }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#374151', cursor: 'pointer' }}
+                  >
+                    ইউজার ম্যানেজমেন্ট
+                  </button>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => { e.preventDefault(); navigate('/settings'); setMenuOpen(false); }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#374151', cursor: 'pointer' }}
+                  >
+                    সেটিংস
+                  </button>
+                </>
+              )}
+              <div style={{ height: 1, background: '#f3f4f6', margin: '4px 0' }} />
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); logout(); navigate('/login', { replace: true }); }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#4f46e5', cursor: 'pointer' }}
+              >
+                <LogOut size={14} />
+                লগআউট
+              </button>
+            </div>
+          )}
 
           <button
             type="button"

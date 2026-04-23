@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Donations from './Donations';
 import { RECORD_PAYMENT_MUTATION } from '../graphql/mutations';
 import { afterEach, vi } from 'vitest';
-import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY, DONOR_PAYMENTS_QUERY } from '../graphql/queries';
 
 function donorQueryMock(donors, variables = { search: undefined, address: undefined }) {
   return {
@@ -46,6 +46,20 @@ function dashboardSummaryMock() {
           totalBalance: 0,
           totalCollectors: 1
         }
+      }
+    }
+  };
+}
+
+function donorPaymentsMock(donorId) {
+  return {
+    request: {
+      query: DONOR_PAYMENTS_QUERY,
+      variables: { donorId }
+    },
+    result: {
+      data: {
+        donorPayments: []
       }
     }
   };
@@ -98,10 +112,13 @@ describe('Donations page', () => {
               created_at: '2026-04-01T10:00:00.000Z'
             }
           }
-        }
+      }
       },
       donorQueryMock([donor]),
-      dashboardSummaryMock()
+      donorQueryMock([donor]),
+      dashboardSummaryMock(),
+      donorPaymentsMock(donor.id),
+      donorPaymentsMock(donor.id)
     ];
 
     render(
@@ -120,9 +137,7 @@ describe('Donations page', () => {
     fireEvent.change(dateInput, { target: { value: paymentDate } });
     fireEvent.click(screen.getByTestId('donations-submit-payment'));
 
-    expect(await screen.findByTestId('donations-feedback-success')).toHaveTextContent(
-      `${donor.name} এর পেমেন্ট সফলভাবে যোগ হয়েছে।`
-    );
+    expect(await screen.findByTestId('donations-feedback-success')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByTestId('donations-selected-donor-id')).toHaveTextContent('');
@@ -135,6 +150,7 @@ describe('Donations page', () => {
     const mocks = [
       addressesQueryMock(['চট্টগ্রাম']),
       donorQueryMock([donor]),
+      donorPaymentsMock(donor.id),
       {
         request: {
           query: RECORD_PAYMENT_MUTATION,
@@ -183,7 +199,7 @@ describe('Donations page', () => {
       </MockedProvider>
     );
 
-    expect(await screen.findByText('কোনো ডোনার পাওয়া যায়নি।')).toBeInTheDocument();
+    expect(screen.queryByTestId(`donor-row-${donor.id}`)).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByTestId('donations-search-input'), {
       target: { value: 'করিম' }

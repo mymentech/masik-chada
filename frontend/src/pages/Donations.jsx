@@ -431,7 +431,7 @@ export default function Donations() {
         })}
       </div>
 
-      {/* Payment bottom sheet */}
+      {/* Payment popup — slide-up sheet on mobile, centered modal on desktop */}
       {selectedDonor ? (
         <div
           role="dialog"
@@ -444,7 +444,9 @@ export default function Donations() {
             zIndex: 30,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-end',
+            justifyContent: isMobile ? 'flex-end' : 'center',
+            alignItems: isMobile ? 'stretch' : 'center',
+            padding: isMobile ? 0 : 20,
           }}
           onClick={(e) => { if (e.target === e.currentTarget) dismissSheet(); }}
         >
@@ -452,24 +454,28 @@ export default function Donations() {
             data-testid="donations-payment-sheet"
             style={{
               background: '#ffffff',
-              borderRadius: '20px 20px 0 0',
-              boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
-              maxHeight: '88svh',
+              borderRadius: isMobile ? '20px 20px 0 0' : 20,
+              boxShadow: isMobile ? '0 -8px 40px rgba(0,0,0,0.18)' : '0 20px 50px rgba(0,0,0,0.2)',
+              maxHeight: isMobile ? '88svh' : '90svh',
+              width: isMobile ? 'auto' : '100%',
+              maxWidth: isMobile ? undefined : 560,
               overflowY: 'auto',
-              animation: 'sheetUp 300ms ease-out',
+              animation: isMobile ? 'sheetUp 300ms ease-out' : 'none',
             }}
           >
-            {/* Drag handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 8px' }}>
-              <div
-                style={{
-                  width: 40,
-                  height: 4,
-                  borderRadius: 2,
-                  background: '#d1d5db',
-                }}
-              />
-            </div>
+            {/* Drag handle — mobile only */}
+            {isMobile && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 8px' }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 4,
+                    borderRadius: 2,
+                    background: '#d1d5db',
+                  }}
+                />
+              </div>
+            )}
 
             <div style={{ padding: '0 20px 32px' }}>
               {/* Donor info */}

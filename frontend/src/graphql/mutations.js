@@ -8,6 +8,8 @@ export const LOGIN_MUTATION = gql`
         id
         name
         email
+        phone
+        role
       }
     }
   }
@@ -67,5 +69,80 @@ export const DELETE_DONOR_MUTATION = gql`
       success
       message
     }
+  }
+`;
+
+export const UPDATE_PROFILE_MUTATION = gql`
+  mutation UpdateProfile($input: UpdateProfileInput!) {
+    updateProfile(input: $input) {
+      id
+      name
+      email
+      phone
+      role
+    }
+  }
+`;
+
+export const CHANGE_PASSWORD_MUTATION = gql`
+  mutation ChangePassword($input: ChangePasswordInput!) {
+    changePassword(input: $input)
+  }
+`;
+
+export const CREATE_USER_MUTATION = gql`
+  mutation CreateUser($input: CreateUserInput!) {
+    createUser(input: $input) {
+      id
+      name
+      email
+      phone
+      role
+    }
+  }
+`;
+
+export const ADMIN_UPDATE_USER_MUTATION = gql`
+  mutation AdminUpdateUser($id: String!, $input: AdminUpdateUserInput!) {
+    adminUpdateUser(id: $id, input: $input) {
+      id
+      name
+      email
+      phone
+      role
+    }
+  }
+`;
+
+export const ADMIN_RESET_PASSWORD_MUTATION = gql`
+  mutation AdminResetUserPassword($id: String!, $newPassword: String!) {
+    adminResetUserPassword(id: $id, newPassword: $newPassword)
+  }
+`;
+
+export const ADMIN_DELETE_USER_MUTATION = gql`
+  mutation AdminDeleteUser($id: String!) {
+    adminDeleteUser(id: $id)
+  }
+`;
+
+export const UPDATE_APP_SETTINGS_MUTATION = gql`
+  mutation UpdateAppSettings($allowDonorDelete: Boolean!) {
+    updateAppSettings(allowDonorDelete: $allowDonorDelete) {
+      allow_donor_delete
+      updated_at
+    }
+  }
+`;
+
+export const REQUEST_PASSWORD_RESET_MUTATION = gql`
+  mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email)
+  }
+`;
+
+export const RESET_PASSWORD_MUTATION = gql`
+  mutation ResetPassword($token: String!, $newPassword: String!) {
+    resetPassword(token: $token, newPassword: $newPassword)
   }
 `;

@@ -5,7 +5,7 @@ import {
   DELETE_DONOR_MUTATION,
   UPDATE_DONOR_MUTATION,
 } from '../graphql/mutations';
-import { DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
 import { useIsMobile } from '../context/MobileContext';
 import PaymentHistory from '../components/PaymentHistory';
 
@@ -423,6 +423,10 @@ export default function Donors() {
     variables,
     fetchPolicy: 'cache-and-network',
   });
+  const { data: settingsData } = useQuery(APP_SETTINGS_QUERY, {
+    fetchPolicy: 'cache-and-network',
+  });
+  const allowDelete = Boolean(settingsData?.appSettings?.allow_donor_delete);
 
   const donors = data?.donors || [];
 
@@ -721,23 +725,25 @@ export default function Donors() {
                     >
                       এডিট
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => removeDonor(donor)}
-                      style={{
-                        background: '#fee2e2',
-                        color: '#ef4444',
-                        border: 'none',
-                        borderRadius: 8,
-                        height: 30,
-                        padding: '0 10px',
-                        fontSize: 12,
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      ডিলিট
-                    </button>
+                    {allowDelete && (
+                      <button
+                        type="button"
+                        onClick={() => removeDonor(donor)}
+                        style={{
+                          background: '#fee2e2',
+                          color: '#ef4444',
+                          border: 'none',
+                          borderRadius: 8,
+                          height: 30,
+                          padding: '0 10px',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ডিলিট
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1028,23 +1034,25 @@ export default function Donors() {
                   >
                     এডিট
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => removeDonor(donor)}
-                    style={{
-                      background: '#fee2e2',
-                      color: '#ef4444',
-                      border: 'none',
-                      borderRadius: 8,
-                      height: 32,
-                      padding: '0 12px',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    ডিলিট
-                  </button>
+                  {allowDelete && (
+                    <button
+                      type="button"
+                      onClick={() => removeDonor(donor)}
+                      style={{
+                        background: '#fee2e2',
+                        color: '#ef4444',
+                        border: 'none',
+                        borderRadius: 8,
+                        height: 32,
+                        padding: '0 12px',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ডিলিট
+                    </button>
+                  )}
                 </div>
               </div>
             );
