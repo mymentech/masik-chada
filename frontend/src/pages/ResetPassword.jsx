@@ -62,7 +62,7 @@ export default function ResetPassword() {
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           <LogoMark size={56} />
         </div>
-        <h1 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: 26, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
           নতুন পাসওয়ার্ড সেট করুন
         </h1>
 
@@ -74,7 +74,7 @@ export default function ResetPassword() {
               color: '#166534',
               borderRadius: 10,
               padding: '14px 16px',
-              fontSize: 14,
+              fontSize: 18,
               marginTop: 18,
               textAlign: 'center',
             }}
@@ -84,7 +84,7 @@ export default function ResetPassword() {
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14, marginTop: 8 }}>
             <div>
-              <label htmlFor="rp-new" style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+              <label htmlFor="rp-new" style={{ display: 'block', fontSize: 17, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
                 নতুন পাসওয়ার্ড
               </label>
               <input
@@ -93,11 +93,11 @@ export default function ResetPassword() {
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 className="ds-input"
-                style={{ width: '100%', height: 48, borderRadius: 12, border: '1.5px solid #d1d5db', background: '#f9fafb', padding: '0 14px', fontSize: 15, outline: 'none' }}
+                style={{ width: '100%', height: 48, borderRadius: 12, border: '1.5px solid #d1d5db', background: '#f9fafb', padding: '0 14px', fontSize: 19, outline: 'none' }}
               />
             </div>
             <div>
-              <label htmlFor="rp-confirm" style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+              <label htmlFor="rp-confirm" style={{ display: 'block', fontSize: 17, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
                 পাসওয়ার্ড কনফার্ম
               </label>
               <input
@@ -106,12 +106,12 @@ export default function ResetPassword() {
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 className="ds-input"
-                style={{ width: '100%', height: 48, borderRadius: 12, border: '1.5px solid #d1d5db', background: '#f9fafb', padding: '0 14px', fontSize: 15, outline: 'none' }}
+                style={{ width: '100%', height: 48, borderRadius: 12, border: '1.5px solid #d1d5db', background: '#f9fafb', padding: '0 14px', fontSize: 19, outline: 'none' }}
               />
             </div>
 
             {error && (
-              <p role="alert" style={{ margin: 0, color: '#ef4444', fontSize: 14, fontWeight: 500 }}>
+              <p role="alert" style={{ margin: 0, color: '#ef4444', fontSize: 18, fontWeight: 500 }}>
                 {error}
               </p>
             )}
@@ -125,7 +125,7 @@ export default function ResetPassword() {
                 color: '#fff',
                 border: 0,
                 borderRadius: 12,
-                fontSize: 15,
+                fontSize: 19,
                 fontWeight: 600,
                 cursor: state.loading ? 'not-allowed' : 'pointer',
               }}
@@ -136,7 +136,7 @@ export default function ResetPassword() {
         )}
 
         <div style={{ textAlign: 'center', marginTop: 18 }}>
-          <Link to="/login" style={{ fontSize: 13, color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>
+          <Link to="/login" style={{ fontSize: 17, color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>
             ← লগইনে ফিরে যান
           </Link>
         </div>

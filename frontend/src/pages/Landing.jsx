@@ -73,10 +73,10 @@ export default function Landing() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <LogoMark size={36} />
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#166534', lineHeight: 1.1 }}>
+              <div style={{ fontSize: 19, fontWeight: 700, color: '#166534', lineHeight: 1.1 }}>
                 ময়দানে মুহাম্মাদ
               </div>
-              <div style={{ fontSize: 10, color: '#16a34a', letterSpacing: '0.3px' }}>
+              <div style={{ fontSize: 14, color: '#16a34a', letterSpacing: '0.3px' }}>
                 Maidan-e-Muhammad
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function Landing() {
               background: '#16a34a',
               color: '#ffffff',
               borderRadius: 10,
-              fontSize: 14,
+              fontSize: 18,
               fontWeight: 600,
               textDecoration: 'none',
               boxShadow: '0 2px 10px rgba(22,163,74,0.25)',
@@ -130,17 +130,17 @@ export default function Landing() {
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <LogoMark size={80} bg="rgba(255,255,255,0.18)" />
           </div>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.75)', fontSize: 13, letterSpacing: 2, textTransform: 'uppercase' }}>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.75)', fontSize: 17, letterSpacing: 2, textTransform: 'uppercase' }}>
             Maidan-e-Muhammad
           </p>
-          <h1 style={{ margin: 0, fontSize: 'clamp(28px, 4.2vw, 44px)', fontWeight: 700, lineHeight: 1.2 }}>
+          <h1 style={{ margin: 0, fontSize: 'clamp(32px, 4.2vw, 48px)', fontWeight: 700, lineHeight: 1.2 }}>
             মাসিক সাবস্ক্রিপশন ও কালেকশন ম্যানেজমেন্ট
           </h1>
           <p
             style={{
               margin: '0 auto',
               maxWidth: 640,
-              fontSize: 16,
+              fontSize: 20,
               color: 'rgba(255,255,255,0.88)',
               lineHeight: 1.7,
             }}
@@ -161,7 +161,7 @@ export default function Landing() {
                 background: '#ffffff',
                 color: '#166534',
                 borderRadius: 12,
-                fontSize: 15,
+                fontSize: 19,
                 fontWeight: 700,
                 textDecoration: 'none',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
@@ -181,10 +181,10 @@ export default function Landing() {
       <section style={{ padding: '56px 0 40px' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <p style={{ color: '#16a34a', fontSize: 12, fontWeight: 700, letterSpacing: 2, margin: 0, textTransform: 'uppercase' }}>
+            <p style={{ color: '#16a34a', fontSize: 16, fontWeight: 700, letterSpacing: 2, margin: 0, textTransform: 'uppercase' }}>
               যে সুবিধাগুলো পাবেন
             </p>
-            <h2 style={{ margin: '8px 0 0', fontSize: 'clamp(22px, 3vw, 30px)', color: '#111827', fontWeight: 700 }}>
+            <h2 style={{ margin: '8px 0 0', fontSize: 'clamp(26px, 3vw, 34px)', color: '#111827', fontWeight: 700 }}>
               একটি প্ল্যাটফর্মে পুরো কালেকশন ম্যানেজমেন্ট
             </h2>
           </div>
@@ -222,10 +222,10 @@ export default function Landing() {
                 >
                   {feature.icon}
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
+                <div style={{ fontSize: 19, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
                   {feature.title}
                 </div>
-                <div style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.6 }}>{feature.text}</div>
+                <div style={{ fontSize: 17, color: '#6b7280', lineHeight: 1.6 }}>{feature.text}</div>
               </div>
             ))}
           </div>
@@ -249,7 +249,7 @@ export default function Landing() {
               boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             }}
           >
-            <h3 style={{ margin: 0, fontSize: 'clamp(20px, 2.4vw, 26px)', color: '#111827', fontWeight: 700 }}>
+            <h3 style={{ margin: 0, fontSize: 'clamp(24px, 2.4vw, 30px)', color: '#111827', fontWeight: 700 }}>
               এখনই শুরু করুন
             </h3>
             <p style={{ margin: 0, color: '#6b7280', maxWidth: 520 }}>
@@ -266,7 +266,7 @@ export default function Landing() {
                 background: '#16a34a',
                 color: '#ffffff',
                 borderRadius: 12,
-                fontSize: 15,
+                fontSize: 19,
                 fontWeight: 700,
                 textDecoration: 'none',
                 marginTop: 6,
@@ -285,11 +285,11 @@ export default function Landing() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <LogoMark size={28} />
-            <span style={{ fontSize: 13, color: '#6b7280' }}>
+            <span style={{ fontSize: 17, color: '#6b7280' }}>
               © {new Date().getFullYear()} ময়দানে মুহাম্মাদ
             </span>
           </div>
-          <Link to="/login" style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>
+          <Link to="/login" style={{ fontSize: 17, color: '#16a34a', fontWeight: 600 }}>
             প্রবেশ করুন →
           </Link>
         </div>

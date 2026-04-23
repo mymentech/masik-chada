@@ -35,7 +35,7 @@ const inputBase = {
   height: 52,
   borderRadius: 12,
   padding: '0 14px',
-  fontSize: 15,
+  fontSize: 19,
   outline: 'none',
   transition: 'border-color 150ms, box-shadow 150ms',
 };
@@ -94,10 +94,10 @@ export default function Login() {
         maxWidth: isMobile ? undefined : 440,
       }}
     >
-      <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 6px', color: '#111827' }}>
+      <h2 style={{ fontSize: 26, fontWeight: 700, margin: '0 0 6px', color: '#111827' }}>
         লগইন করুন
       </h2>
-      <p style={{ margin: '0 0 24px', color: '#6b7280', fontSize: 14 }}>
+      <p style={{ margin: '0 0 24px', color: '#6b7280', fontSize: 18 }}>
         আপনার অ্যাকাউন্টে প্রবেশ করতে ইমেইল ও পাসওয়ার্ড দিন।
       </p>
 
@@ -105,7 +105,7 @@ export default function Login() {
         <div>
           <label
             htmlFor="email"
-            style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 6 }}
+            style={{ display: 'block', fontSize: 18, fontWeight: 600, color: '#374151', marginBottom: 6 }}
           >
             ইমেইল
           </label>
@@ -126,13 +126,13 @@ export default function Login() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
             <label
               htmlFor="password"
-              style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}
+              style={{ fontSize: 18, fontWeight: 600, color: '#374151' }}
             >
               পাসওয়ার্ড
             </label>
             <Link
               to="/forgot-password"
-              style={{ fontSize: 13, color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}
+              style={{ fontSize: 17, color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}
             >
               পাসওয়ার্ড ভুলে গেছেন?
             </Link>
@@ -173,7 +173,7 @@ export default function Login() {
         </div>
 
         {uiError ? (
-          <p role="alert" style={{ margin: 0, color: '#ef4444', fontSize: 14, fontWeight: 500 }}>
+          <p role="alert" style={{ margin: 0, color: '#ef4444', fontSize: 18, fontWeight: 500 }}>
             {uiError}
           </p>
         ) : null}
@@ -187,7 +187,7 @@ export default function Login() {
             color: '#ffffff',
             border: 0,
             borderRadius: 12,
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: 600,
             cursor: loading ? 'not-allowed' : 'pointer',
             marginTop: 4,
@@ -199,7 +199,7 @@ export default function Login() {
         </button>
 
         <div style={{ textAlign: 'center', marginTop: 6 }}>
-          <Link to="/" style={{ fontSize: 13, color: '#6b7280', textDecoration: 'none' }}>
+          <Link to="/" style={{ fontSize: 17, color: '#6b7280', textDecoration: 'none' }}>
             ← হোমপেজে ফিরে যান
           </Link>
         </div>
@@ -228,10 +228,10 @@ export default function Login() {
           }}
         >
           <LogoMark size={72} bg="rgba(255,255,255,0.18)" />
-          <h1 style={{ color: '#ffffff', fontSize: 26, fontWeight: 700, margin: '18px 0 6px', textAlign: 'center' }}>
+          <h1 style={{ color: '#ffffff', fontSize: 30, fontWeight: 700, margin: '18px 0 6px', textAlign: 'center' }}>
             ময়দানে মুহাম্মাদ
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: 14, margin: 0 }}>Maidan-e-Muhammad</p>
+          <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: 18, margin: 0 }}>Maidan-e-Muhammad</p>
         </div>
         {formCard}
       </div>
@@ -258,25 +258,25 @@ export default function Login() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <LogoMark size={44} bg="rgba(255,255,255,0.18)" />
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700 }}>ময়দানে মুহাম্মাদ</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.72)', letterSpacing: 1 }}>
+            <div style={{ fontSize: 20, fontWeight: 700 }}>ময়দানে মুহাম্মাদ</div>
+            <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.72)', letterSpacing: 1 }}>
               Maidan-e-Muhammad
             </div>
           </div>
         </div>
 
         <div>
-          <h1 style={{ fontSize: 40, fontWeight: 700, margin: '0 0 14px', lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: 44, fontWeight: 700, margin: '0 0 14px', lineHeight: 1.2 }}>
             মাসিক চাঁদা সংগ্রহ এখন আরও সহজ
           </h1>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: 16, lineHeight: 1.7, maxWidth: 460 }}>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: 20, lineHeight: 1.7, maxWidth: 460 }}>
             দাতা, কালেকশন, রিপোর্ট — সব একজায়গায়। মাঠ পর্যায়ে কাজকে আরও দ্রুত ও নির্ভুল করুন।
           </p>
         </div>
 
         <div style={{ display: 'grid', gap: 10 }}>
           {['মাসিক চাঁদার স্বয়ংক্রিয় হিসাব', 'বিস্তারিত কালেক্টর রিপোর্ট', 'নিরাপদ ও ভূমিকা-ভিত্তিক অ্যাক্সেস'].map((t) => (
-            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>
+            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
               <span
                 style={{
                   width: 22,

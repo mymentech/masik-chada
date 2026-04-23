@@ -49,7 +49,7 @@ export default function PaymentHistory({ donorId, title = 'পূর্বের
           marginBottom: 10,
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{title}</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>{title}</div>
         {payments.length > 0 && (
           <span
             style={{
@@ -57,7 +57,7 @@ export default function PaymentHistory({ donorId, title = 'পূর্বের
               color: '#166534',
               borderRadius: 999,
               padding: '2px 10px',
-              fontSize: 12,
+              fontSize: 16,
               fontWeight: 600,
             }}
           >
@@ -67,19 +67,19 @@ export default function PaymentHistory({ donorId, title = 'পূর্বের
       </div>
 
       {loading && payments.length === 0 ? (
-        <p style={{ margin: 0, color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: '12px 0' }}>
+        <p style={{ margin: 0, color: '#9ca3af', fontSize: 17, textAlign: 'center', padding: '12px 0' }}>
           লোড হচ্ছে...
         </p>
       ) : null}
 
       {error ? (
-        <p style={{ margin: 0, color: '#ef4444', fontSize: 13 }}>
+        <p style={{ margin: 0, color: '#ef4444', fontSize: 17 }}>
           পেমেন্ট হিস্ট্রি আনা যায়নি।
         </p>
       ) : null}
 
       {!loading && !error && payments.length === 0 ? (
-        <p style={{ margin: 0, color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: '12px 0' }}>
+        <p style={{ margin: 0, color: '#9ca3af', fontSize: 17, textAlign: 'center', padding: '12px 0' }}>
           এখনো কোনো পেমেন্ট নেই।
         </p>
       ) : null}
@@ -103,7 +103,7 @@ export default function PaymentHistory({ donorId, title = 'পূর্বের
                 alignItems: 'center',
                 padding: '10px 12px',
                 borderBottom: idx === payments.length - 1 ? 'none' : '1px solid #f3f4f6',
-                fontSize: 13,
+                fontSize: 17,
               }}
             >
               <span style={{ color: '#374151' }}>{formatDate(p.payment_date)}</span>

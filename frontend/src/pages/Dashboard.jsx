@@ -69,8 +69,8 @@ function StatCard({ label, value, iconBg, iconColor, icon }) {
         </svg>
       </div>
       <div>
-        <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>{label}</p>
-        <p style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>
+        <p style={{ margin: 0, fontSize: 16, color: '#9ca3af', fontWeight: 500 }}>{label}</p>
+        <p style={{ margin: '4px 0 0', fontSize: 30, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>
           {value}
         </p>
       </div>
@@ -162,21 +162,21 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {isMobile && <LogoMark size={32} bg="rgba(255,255,255,0.2)" />}
             <div>
-              <p style={{ margin: 0, color: 'rgba(255,255,255,0.72)', fontSize: 13 }}>
+              <p style={{ margin: 0, color: 'rgba(255,255,255,0.72)', fontSize: 17 }}>
                 স্বাগতম
               </p>
               <h1
                 style={{
                   margin: 0,
                   color: '#ffffff',
-                  fontSize: isMobile ? 20 : 22,
+                  fontSize: isMobile ? 24 : 26,
                   fontWeight: 700,
                   lineHeight: 1.2,
                 }}
               >
                 {userName}
               </h1>
-              <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.6)', fontSize: 12 }}>
+              <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.6)', fontSize: 16 }}>
                 {todayBengali()}
               </p>
             </div>
@@ -292,13 +292,13 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#111827' }}>
+                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>
                   স্বাগতম, {userName}!
                 </h2>
-                <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>অ্যাডমিন প্যানেল</p>
+                <p style={{ margin: 0, fontSize: 17, color: '#6b7280' }}>অ্যাডমিন প্যানেল</p>
               </div>
             </div>
-            <p style={{ margin: '0 0 16px', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
+            <p style={{ margin: '0 0 16px', fontSize: 18, color: '#6b7280', lineHeight: 1.6 }}>
               ময়দানে মুহাম্মাদ মাসিক চাঁদা ব্যবস্থাপনা সিস্টেমে আপনাকে স্বাগতম। চাঁদা সংগ্রহ শুরু করতে বা রিপোর্ট দেখতে নিচের বাটন ব্যবহার করুন।
             </p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -313,7 +313,7 @@ export default function Dashboard() {
                   borderRadius: 10,
                   padding: '0 16px',
                   fontWeight: 600,
-                  fontSize: 14,
+                  fontSize: 18,
                   cursor: 'pointer',
                 }}
               >
@@ -330,7 +330,7 @@ export default function Dashboard() {
                   borderRadius: 10,
                   padding: '0 16px',
                   fontWeight: 600,
-                  fontSize: 14,
+                  fontSize: 18,
                   cursor: 'pointer',
                 }}
               >
@@ -348,7 +348,7 @@ export default function Dashboard() {
               boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
-            <h2 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#111827' }}>
+            <h2 style={{ margin: '0 0 16px', fontSize: 20, fontWeight: 700, color: '#111827' }}>
               সারসংক্ষেপ
             </h2>
             <div style={{ display: 'grid', gap: 12 }}>
@@ -383,8 +383,8 @@ export default function Dashboard() {
                     padding: '10px 14px',
                   }}
                 >
-                  <span style={{ fontSize: 13, color: '#6b7280' }}>{item.label}</span>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: item.color }}>
+                  <span style={{ fontSize: 17, color: '#6b7280' }}>{item.label}</span>
+                  <span style={{ fontSize: 19, fontWeight: 700, color: item.color }}>
                     {item.value}
                   </span>
                 </div>

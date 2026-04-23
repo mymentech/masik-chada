@@ -96,7 +96,7 @@ export default function BottomNav() {
           {({ isActive }) => (
             <>
               <Icon color={isActive ? '#16a34a' : '#9ca3af'} />
-              <span style={{ fontSize: 10, fontWeight: isActive ? 600 : 400, lineHeight: 1.2 }}>
+              <span style={{ fontSize: 14, fontWeight: isActive ? 604 : 404, lineHeight: 1.2 }}>
                 {label}
               </span>
             </>

@@ -16,7 +16,7 @@ const cardStyle = (isMobile) => ({
 
 const labelStyle = {
   display: 'block',
-  fontSize: 13,
+  fontSize: 17,
   fontWeight: 600,
   color: '#374151',
   marginBottom: 6,
@@ -29,7 +29,7 @@ const inputStyle = {
   border: '1.5px solid #d1d5db',
   background: '#f9fafb',
   padding: '0 14px',
-  fontSize: 14,
+  fontSize: 18,
   outline: 'none',
 };
 
@@ -40,7 +40,7 @@ const buttonPrimary = (loading) => ({
   border: 0,
   borderRadius: 12,
   fontWeight: 600,
-  fontSize: 14,
+  fontSize: 18,
   cursor: loading ? 'not-allowed' : 'pointer',
   padding: '0 22px',
 });
@@ -57,7 +57,7 @@ function Feedback({ notice }) {
         color: isError ? '#991b1b' : '#166534',
         borderRadius: 10,
         padding: '10px 14px',
-        fontSize: 14,
+        fontSize: 18,
         marginBottom: 14,
       }}
     >
@@ -148,7 +148,7 @@ export default function Profile() {
   return (
     <div style={{ background: '#f9fafb', minHeight: '100svh', padding: isMobile ? '16px' : '24px 0' }}>
       <div className={isMobile ? '' : 'container'} style={{ display: 'grid', gap: 20, maxWidth: 820 }}>
-        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>প্রোফাইল</h1>
+        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>প্রোফাইল</h1>
 
         {isAdmin && isMobile && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -164,7 +164,7 @@ export default function Profile() {
                 borderRadius: 12,
                 color: '#92400e',
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 17,
                 textDecoration: 'none',
               }}
             >
@@ -182,7 +182,7 @@ export default function Profile() {
                 borderRadius: 12,
                 color: '#1d4ed8',
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 17,
                 textDecoration: 'none',
               }}
             >
@@ -202,7 +202,7 @@ export default function Profile() {
               background: '#eef2ff',
               color: '#4f46e5',
               fontWeight: 600,
-              fontSize: 14,
+              fontSize: 18,
               cursor: 'pointer',
             }}
           >
@@ -215,7 +215,7 @@ export default function Profile() {
         ) : null}
 
         <section style={cardStyle(isMobile)}>
-          <h2 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#111827' }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: 20, fontWeight: 700, color: '#111827' }}>
             ব্যক্তিগত তথ্য
           </h2>
           <Feedback notice={profileNotice} />
@@ -261,7 +261,7 @@ export default function Profile() {
                   color: isAdmin ? '#92400e' : '#166534',
                   borderRadius: 999,
                   padding: '4px 12px',
-                  fontSize: 12,
+                  fontSize: 16,
                   fontWeight: 600,
                 }}
               >
@@ -277,7 +277,7 @@ export default function Profile() {
         </section>
 
         <section style={cardStyle(isMobile)}>
-          <h2 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#111827' }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: 20, fontWeight: 700, color: '#111827' }}>
             পাসওয়ার্ড পরিবর্তন
           </h2>
           <Feedback notice={pwNotice} />

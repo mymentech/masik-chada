@@ -23,7 +23,7 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 function RouteFallback() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
-      <p style={{ color: '#9ca3af', fontSize: 14 }}>পৃষ্ঠা লোড হচ্ছে...</p>
+      <p style={{ color: '#9ca3af', fontSize: 18 }}>পৃষ্ঠা লোড হচ্ছে...</p>
     </div>
   );
 }

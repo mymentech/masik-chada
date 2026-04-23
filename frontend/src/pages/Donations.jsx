@@ -52,7 +52,7 @@ function SerialBadge({ number }) {
         background: '#dcfce7',
         color: '#166534',
         borderRadius: 6,
-        fontSize: 11,
+        fontSize: 15,
         fontWeight: 600,
         flexShrink: 0,
       }}
@@ -192,7 +192,7 @@ export default function Donations() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>{notice.text}</span>
+          <span style={{ fontSize: 18, fontWeight: 600 }}>{notice.text}</span>
         </div>
       ) : null}
 
@@ -210,7 +210,7 @@ export default function Donations() {
         <div className={isMobile ? '' : 'container'}>
           {/* Title row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>চাঁদা সংগ্রহ</h1>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>চাঁদা সংগ্রহ</h1>
             {totalDues > 0 && (
               <span
                 style={{
@@ -218,7 +218,7 @@ export default function Donations() {
                   color: '#ef4444',
                   borderRadius: 999,
                   padding: '3px 10px',
-                  fontSize: 12,
+                  fontSize: 16,
                   fontWeight: 600,
                 }}
               >
@@ -275,7 +275,7 @@ export default function Donations() {
                 border: '1px solid #d1d5db',
                 background: '#fff',
                 padding: '0 12px',
-                fontSize: 13,
+                fontSize: 17,
                 color: '#374151',
                 cursor: 'pointer',
                 outline: 'none',
@@ -297,13 +297,13 @@ export default function Donations() {
           className={isMobile ? '' : 'container'}
           style={{ padding: '8px 16px', display: 'flex', alignItems: 'center' }}
         >
-          <span style={{ flex: 1, fontSize: 11, fontWeight: 700, color: '#166534' }}>
+          <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: '#166534' }}>
             সিরিয়াল · নাম
           </span>
-          <span style={{ width: 52, textAlign: 'right', fontSize: 11, fontWeight: 700, color: '#166534' }}>
+          <span style={{ width: 52, textAlign: 'right', fontSize: 15, fontWeight: 700, color: '#166534' }}>
             মাসিক
           </span>
-          <span style={{ width: 72, textAlign: 'right', fontSize: 11, fontWeight: 700, color: '#166534' }}>
+          <span style={{ width: 72, textAlign: 'right', fontSize: 15, fontWeight: 700, color: '#166534' }}>
             বকেয়া
           </span>
         </div>
@@ -312,7 +312,7 @@ export default function Donations() {
       {/* Error / empty states */}
       <div className={isMobile ? '' : 'container'}>
         {error ? (
-          <p style={{ margin: '16px', color: '#ef4444', fontSize: 14 }}>
+          <p style={{ margin: '16px', color: '#ef4444', fontSize: 18 }}>
             ডোনার তালিকা লোড করা যায়নি।
           </p>
         ) : null}
@@ -329,7 +329,7 @@ export default function Donations() {
               color: '#991b1b',
               borderRadius: 10,
               padding: '10px 14px',
-              fontSize: 14,
+              fontSize: 18,
             }}
           >
             {notice.text}
@@ -345,13 +345,13 @@ export default function Donations() {
         className={isMobile ? '' : 'container'}
       >
         {loading && donors.length === 0 ? (
-          <p style={{ color: '#9ca3af', textAlign: 'center', padding: '40px 0', fontSize: 14 }}>
+          <p style={{ color: '#9ca3af', textAlign: 'center', padding: '40px 0', fontSize: 18 }}>
             তালিকা লোড হচ্ছে...
           </p>
         ) : null}
 
         {!loading && donors.length === 0 ? (
-          <p style={{ color: '#9ca3af', textAlign: 'center', padding: '40px 0', fontSize: 14 }}>
+          <p style={{ color: '#9ca3af', textAlign: 'center', padding: '40px 0', fontSize: 18 }}>
             কোনো দাতা পাওয়া যায়নি।
           </p>
         ) : null}
@@ -389,7 +389,7 @@ export default function Donations() {
                 <div style={{ minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 15,
+                      fontSize: 19,
                       fontWeight: 600,
                       color: '#111827',
                       whiteSpace: 'nowrap',
@@ -399,7 +399,7 @@ export default function Donations() {
                   >
                     {donor.name}
                   </div>
-                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 1 }}>{donor.address}</div>
+                  <div style={{ fontSize: 16, color: '#9ca3af', marginTop: 1 }}>{donor.address}</div>
                 </div>
               </div>
 
@@ -408,7 +408,7 @@ export default function Donations() {
                 style={{
                   width: 52,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: 16,
                   color: '#6b7280',
                   flexShrink: 0,
                 }}
@@ -419,9 +419,9 @@ export default function Donations() {
               {/* Balance */}
               <div style={{ width: 72, textAlign: 'right', flexShrink: 0 }}>
                 {isPaid ? (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#16a34a' }}>✓ পরিশোধিত</span>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: '#16a34a' }}>✓ পরিশোধিত</span>
                 ) : (
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#ef4444' }}>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: '#ef4444' }}>
                     {formatMoney(donor.balance)}
                   </span>
                 )}
@@ -477,15 +477,15 @@ export default function Donations() {
               </div>
             )}
 
-            <div style={{ padding: '0 20px 32px' }}>
+            <div style={{ padding: isMobile ? '0 20px 32px' : '24px 20px 32px' }}>
               {/* Donor info */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>
+                  <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>
                     {selectedDonor.name}
                   </h2>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 13, color: '#6b7280' }}>{selectedDonor.address}</span>
+                    <span style={{ fontSize: 17, color: '#6b7280' }}>{selectedDonor.address}</span>
                     <SerialBadge number={selectedDonor.serial_number} />
                     {Number(selectedDonor.balance) > 0 && (
                       <span
@@ -494,7 +494,7 @@ export default function Donations() {
                           color: '#ef4444',
                           borderRadius: 999,
                           padding: '2px 8px',
-                          fontSize: 12,
+                          fontSize: 16,
                           fontWeight: 600,
                         }}
                       >
@@ -533,7 +533,7 @@ export default function Donations() {
                 <div>
                   <label
                     htmlFor="payment-amount"
-                    style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 8 }}
+                    style={{ display: 'block', fontSize: 18, fontWeight: 600, color: '#374151', marginBottom: 8 }}
                   >
                     টাকার পরিমাণ (৳)
                   </label>
@@ -551,7 +551,7 @@ export default function Donations() {
                       height: 60,
                       borderRadius: 12,
                       padding: '0 16px',
-                      fontSize: 28,
+                      fontSize: 32,
                       fontWeight: 700,
                     }}
                   />
@@ -574,7 +574,7 @@ export default function Donations() {
                           color: isActive ? '#ffffff' : '#374151',
                           fontWeight: 600,
                           cursor: 'pointer',
-                          fontSize: 14,
+                          fontSize: 18,
                           transition: 'all 150ms',
                         }}
                       >
@@ -588,7 +588,7 @@ export default function Donations() {
                 <div>
                   <label
                     htmlFor="payment-date"
-                    style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 8 }}
+                    style={{ display: 'block', fontSize: 18, fontWeight: 600, color: '#374151', marginBottom: 8 }}
                   >
                     তারিখ
                   </label>
@@ -618,7 +618,7 @@ export default function Donations() {
                     color: '#ffffff',
                     border: 0,
                     borderRadius: 12,
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: 600,
                     cursor: paymentState.loading ? 'not-allowed' : 'pointer',
                     boxShadow: '0 4px 14px rgba(22,163,74,0.3)',

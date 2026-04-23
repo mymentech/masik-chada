@@ -44,10 +44,10 @@ export default function ForgotPassword() {
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           <LogoMark size={56} />
         </div>
-        <h1 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: 26, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
           পাসওয়ার্ড রিসেট
         </h1>
-        <p style={{ margin: '0 0 22px', color: '#6b7280', fontSize: 14, textAlign: 'center', lineHeight: 1.6 }}>
+        <p style={{ margin: '0 0 22px', color: '#6b7280', fontSize: 18, textAlign: 'center', lineHeight: 1.6 }}>
           আপনার রেজিস্টার্ড ইমেইলে পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।
         </p>
 
@@ -59,7 +59,7 @@ export default function ForgotPassword() {
               color: '#166534',
               borderRadius: 10,
               padding: '14px 16px',
-              fontSize: 14,
+              fontSize: 18,
               lineHeight: 1.6,
             }}
           >
@@ -69,7 +69,7 @@ export default function ForgotPassword() {
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14 }}>
             <div>
-              <label htmlFor="fp-email" style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+              <label htmlFor="fp-email" style={{ display: 'block', fontSize: 17, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
                 ইমেইল
               </label>
               <input
@@ -79,7 +79,7 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="ds-input"
-                style={{ width: '100%', height: 48, borderRadius: 12, border: '1.5px solid #d1d5db', background: '#f9fafb', padding: '0 14px', fontSize: 15, outline: 'none' }}
+                style={{ width: '100%', height: 48, borderRadius: 12, border: '1.5px solid #d1d5db', background: '#f9fafb', padding: '0 14px', fontSize: 19, outline: 'none' }}
               />
             </div>
             <button
@@ -91,7 +91,7 @@ export default function ForgotPassword() {
                 color: '#fff',
                 border: 0,
                 borderRadius: 12,
-                fontSize: 15,
+                fontSize: 19,
                 fontWeight: 600,
                 cursor: state.loading ? 'not-allowed' : 'pointer',
               }}
@@ -102,7 +102,7 @@ export default function ForgotPassword() {
         )}
 
         <div style={{ textAlign: 'center', marginTop: 18 }}>
-          <Link to="/login" style={{ fontSize: 13, color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>
+          <Link to="/login" style={{ fontSize: 17, color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>
             ← লগইনে ফিরে যান
           </Link>
         </div>

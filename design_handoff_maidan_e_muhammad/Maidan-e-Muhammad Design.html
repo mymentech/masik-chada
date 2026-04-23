@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ময়দানে মুহাম্মাদ — Design System</title>
+  <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; font-family: 'Nikosh', 'NikoshBAN', sans-serif; }
+    #root { width: 100vw; height: 100vh; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="mm-common.jsx"></script>
+<script type="text/babel" src="mm-screens-a.jsx"></script>
+<script type="text/babel" src="mm-screens-b.jsx"></script>
+<script type="text/babel" src="mm-logo-colors.jsx"></script>
+<script type="text/babel" src="mm-desktop.jsx"></script>
+
+<script type="text/babel">
+const {
+  DesignCanvas, DCSection, DCArtboard,
+  LogoFull, ColorTokens, ComponentLibrary,
+  SplashScreen, LoginScreen, DashboardScreen, DonationsScreen,
+  PaymentScreen, DonorMgmtScreen, AddDonorScreen, ReportsScreen, ToastScreen,
+  DesktopDashboard, DesktopDonations, DesktopDonors, DesktopReports,
+} = window;
+
+function App() {
+  return (
+    <DesignCanvas title="ময়দানে মুহাম্মাদ — Design System">
+
+      <DCSection id="logo" title="লোগো">
+        <DCArtboard id="logo-all" label="লোগো ভেরিয়েন্ট" width={560} height={320}>
+          <LogoFull />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="colors" title="রঙ প্যালেট">
+        <DCArtboard id="colors-ref" label="কালার টোকেন" width={740} height={420}>
+          <ColorTokens />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="components" title="কম্পোনেন্ট লাইব্রেরি">
+        <DCArtboard id="components-lib" label="সকল কম্পোনেন্ট" width={820} height={620}>
+          <ComponentLibrary />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="screens-1-3" title="স্ক্রিন ১–৩">
+        <DCArtboard id="s1-splash" label="স্প্ল্যাশ স্ক্রিন" width={390} height={844}>
+          <SplashScreen />
+        </DCArtboard>
+        <DCArtboard id="s2-login" label="লগইন" width={390} height={844}>
+          <LoginScreen />
+        </DCArtboard>
+        <DCArtboard id="s3-dashboard" label="ড্যাশবোর্ড" width={390} height={844}>
+          <DashboardScreen />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="screens-4-6" title="স্ক্রিন ৪–৬">
+        <DCArtboard id="s4-donations" label="চাঁদা সংগ্রহ" width={390} height={844}>
+          <DonationsScreen />
+        </DCArtboard>
+        <DCArtboard id="s5-payment" label="পেমেন্ট শিট" width={390} height={844}>
+          <PaymentScreen />
+        </DCArtboard>
+        <DCArtboard id="s6-donors" label="দাতা ম্যানেজমেন্ট" width={390} height={844}>
+          <DonorMgmtScreen />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="screens-7-9" title="স্ক্রিন ৭–৯">
+        <DCArtboard id="s7-adddonor" label="নতুন দাতা ফর্ম" width={390} height={844}>
+          <AddDonorScreen />
+        </DCArtboard>
+        <DCArtboard id="s8-reports" label="রিপোর্ট" width={390} height={844}>
+          <ReportsScreen />
+        </DCArtboard>
+        <DCArtboard id="s9-toast" label="সাফল্য টোস্ট" width={390} height={844}>
+          <ToastScreen />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="desktop" title="ডেস্কটপ স্ক্রিন">
+        <DCArtboard id="d1-dashboard" label="ডেস্কটপ ড্যাশবোর্ড" width={1440} height={900}>
+          <DesktopDashboard />
+        </DCArtboard>
+        <DCArtboard id="d2-donations" label="ডেস্কটপ চাঁদা সংগ্রহ" width={1440} height={900}>
+          <DesktopDonations />
+        </DCArtboard>
+        <DCArtboard id="d3-donors" label="ডেস্কটপ দাতা ম্যানেজমেন্ট" width={1440} height={900}>
+          <DesktopDonors />
+        </DCArtboard>
+        <DCArtboard id="d4-reports" label="ডেস্কটপ রিপোর্ট" width={1440} height={900}>
+          <DesktopReports />
+        </DCArtboard>
+      </DCSection>
+
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="80" fill="#166534"/>
+    <rect x="36" y="10" width="48" height="60" rx="8" fill="#15803d"/>
+    <rect x="42" y="55" width="36" height="4" rx="1" fill="white" opacity="0.9"/>
+    <path d="M44 55 Q44 38 60 38 Q76 38 76 55Z" fill="white" opacity="0.9"/>
+    <circle cx="60" cy="33" r="7" fill="white" opacity="0.9"/>
+    <circle cx="63" cy="30" r="6" fill="#15803d"/>
+    <circle cx="67" cy="28" r="1.5" fill="white" opacity="0.9"/>
+  </svg>
+</template>
+</body>
+</html>

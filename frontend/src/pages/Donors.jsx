@@ -55,7 +55,7 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
       border: focused ? '2px solid #16a34a' : '1.5px solid #d1d5db',
       background: '#f9fafb',
       padding: '0 14px',
-      fontSize: 14,
+      fontSize: 18,
       outline: 'none',
       boxShadow: focused ? '0 0 0 3px rgba(22,163,74,0.12)' : 'none',
       transition: 'border-color 150ms, box-shadow 150ms',
@@ -64,7 +64,7 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
 
   const labelStyle = {
     display: 'block',
-    fontSize: 13,
+    fontSize: 17,
     fontWeight: 600,
     color: '#374151',
     marginBottom: 5,
@@ -137,7 +137,7 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
                   color: isActive ? '#ffffff' : '#374151',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  fontSize: 13,
+                  fontSize: 17,
                 }}
               >
                 ৳{a}
@@ -183,7 +183,7 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
               borderRadius: 10,
               padding: '10px 12px',
               color: '#92400e',
-              fontSize: 13,
+              fontSize: 17,
               lineHeight: 1.5,
             }}
           >
@@ -205,7 +205,7 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
               border: 'none',
               borderRadius: 12,
               fontWeight: 600,
-              fontSize: 14,
+              fontSize: 18,
               cursor: 'pointer',
             }}
           >
@@ -223,7 +223,7 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
             border: 'none',
             borderRadius: 12,
             fontWeight: 600,
-            fontSize: 14,
+            fontSize: 18,
             cursor: isSubmitting ? 'not-allowed' : 'pointer',
             transition: 'background 150ms',
           }}
@@ -279,12 +279,12 @@ function DonorViewSheet({ donor, onClose, onEdit }) {
             <div style={{ minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <SerialBadge number={donor.serial_number} />
-                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>
+                <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
                   {donor.name}
                 </h2>
               </div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>{donor.address}</div>
-              {donor.phone && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>{donor.phone}</div>}
+              <div style={{ fontSize: 17, color: '#6b7280' }}>{donor.address}</div>
+              {donor.phone && <div style={{ fontSize: 17, color: '#6b7280', marginTop: 2 }}>{donor.phone}</div>}
             </div>
             <button
               type="button"
@@ -320,14 +320,14 @@ function DonorViewSheet({ donor, onClose, onEdit }) {
             }}
           >
             <div style={{ background: '#f9fafb', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2 }}>মাসিক</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>
+              <div style={{ fontSize: 15, color: '#6b7280', marginBottom: 2 }}>মাসিক</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>
                 {formatMoney(donor.monthly_amount)}
               </div>
             </div>
             <div style={{ background: '#f0fdf4', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 11, color: '#166534', marginBottom: 2 }}>পরিশোধিত</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#166534' }}>
+              <div style={{ fontSize: 15, color: '#166534', marginBottom: 2 }}>পরিশোধিত</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#166534' }}>
                 {formatMoney(donor.total_paid)}
               </div>
             </div>
@@ -338,12 +338,12 @@ function DonorViewSheet({ donor, onClose, onEdit }) {
                 padding: '10px 12px',
               }}
             >
-              <div style={{ fontSize: 11, color: isPaid ? '#166534' : '#991b1b', marginBottom: 2 }}>
+              <div style={{ fontSize: 15, color: isPaid ? '#166534' : '#991b1b', marginBottom: 2 }}>
                 বকেয়া
               </div>
               <div
                 style={{
-                  fontSize: 14,
+                  fontSize: 18,
                   fontWeight: 700,
                   color: isPaid ? '#166534' : '#ef4444',
                 }}
@@ -368,7 +368,7 @@ function DonorViewSheet({ donor, onClose, onEdit }) {
                 border: 'none',
                 borderRadius: 12,
                 fontWeight: 600,
-                fontSize: 14,
+                fontSize: 18,
                 cursor: 'pointer',
               }}
             >
@@ -394,7 +394,7 @@ function SerialBadge({ number }) {
         background: '#dcfce7',
         color: '#166534',
         borderRadius: 6,
-        fontSize: 11,
+        fontSize: 15,
         fontWeight: 600,
         flexShrink: 0,
       }}
@@ -560,7 +560,7 @@ export default function Donors() {
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
               দাতা ম্যানেজমেন্ট
               {donors.length > 0 && (
                 <span
@@ -570,7 +570,7 @@ export default function Donors() {
                     color: '#166534',
                     borderRadius: 999,
                     padding: '2px 8px',
-                    fontSize: 12,
+                    fontSize: 16,
                     fontWeight: 600,
                   }}
                 >
@@ -589,7 +589,7 @@ export default function Donors() {
                 borderRadius: 10,
                 padding: '0 14px',
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 17,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -639,7 +639,7 @@ export default function Donors() {
               color: message.type === 'error' ? '#991b1b' : '#166534',
               borderRadius: 10,
               padding: '10px 14px',
-              fontSize: 14,
+              fontSize: 18,
             }}
           >
             {message.text}
@@ -647,7 +647,7 @@ export default function Donors() {
         )}
 
         {error && (
-          <p style={{ margin: '10px 16px', color: '#ef4444', fontSize: 14 }}>
+          <p style={{ margin: '10px 16px', color: '#ef4444', fontSize: 18 }}>
             দাতা তালিকা আনা যায়নি।
           </p>
         )}
@@ -655,7 +655,7 @@ export default function Donors() {
         {/* List */}
         <div style={{ padding: '8px 0' }}>
           {loading && donors.length === 0 && (
-            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '40px 0', fontSize: 14 }}>
+            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '40px 0', fontSize: 18 }}>
               লোড হচ্ছে...
             </p>
           )}
@@ -675,9 +675,9 @@ export default function Donors() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flex: 1, minWidth: 0 }}>
                     <SerialBadge number={donor.serial_number} />
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{donor.name}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{donor.address}</div>
-                      <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 1 }}>
+                      <div style={{ fontSize: 18, fontWeight: 600, color: '#111827' }}>{donor.name}</div>
+                      <div style={{ fontSize: 16, color: '#6b7280', marginTop: 2 }}>{donor.address}</div>
+                      <div style={{ fontSize: 16, color: '#9ca3af', marginTop: 1 }}>
                         মাসিক: {formatMoney(donor.monthly_amount)}
                         {' · '}
                         {isPaid ? (
@@ -701,7 +701,7 @@ export default function Donors() {
                         borderRadius: 8,
                         height: 30,
                         padding: '0 10px',
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: 600,
                         cursor: 'pointer',
                       }}
@@ -718,7 +718,7 @@ export default function Donors() {
                         borderRadius: 8,
                         height: 30,
                         padding: '0 10px',
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: 600,
                         cursor: 'pointer',
                       }}
@@ -736,7 +736,7 @@ export default function Donors() {
                           borderRadius: 8,
                           height: 30,
                           padding: '0 10px',
-                          fontSize: 12,
+                          fontSize: 16,
                           fontWeight: 600,
                           cursor: 'pointer',
                         }}
@@ -783,7 +783,7 @@ export default function Donors() {
               </div>
               <div style={{ padding: '4px 20px 40px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                  <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>
+                  <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
                     {editingDonor ? 'দাতা আপডেট' : 'নতুন দাতা যোগ করুন'}
                   </h2>
                   <button
@@ -850,7 +850,7 @@ export default function Donors() {
           {/* Table header */}
           <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>
+              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
                 দাতা ম্যানেজমেন্ট
                 {donors.length > 0 && (
                   <span
@@ -860,7 +860,7 @@ export default function Donors() {
                       color: '#166534',
                       borderRadius: 999,
                       padding: '2px 8px',
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: 600,
                     }}
                   >
@@ -879,7 +879,7 @@ export default function Donors() {
                   borderRadius: 10,
                   padding: '0 16px',
                   fontWeight: 600,
-                  fontSize: 14,
+                  fontSize: 18,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -929,7 +929,7 @@ export default function Donors() {
                 color: message.type === 'error' ? '#991b1b' : '#166534',
                 borderRadius: 10,
                 padding: '10px 14px',
-                fontSize: 14,
+                fontSize: 18,
               }}
             >
               {message.text}
@@ -937,7 +937,7 @@ export default function Donors() {
           )}
 
           {error && (
-            <p style={{ margin: '12px 20px', color: '#ef4444', fontSize: 14 }}>
+            <p style={{ margin: '12px 20px', color: '#ef4444', fontSize: 18 }}>
               দাতা তালিকা আনা যায়নি।
             </p>
           )}
@@ -954,7 +954,7 @@ export default function Donors() {
             }}
           >
             {['ক্র.', 'নাম', 'ঠিকানা', 'মাসিক', 'বকেয়া', 'অ্যাকশন'].map((col) => (
-              <span key={col} style={{ fontSize: 11, fontWeight: 700, color: '#166534' }}>
+              <span key={col} style={{ fontSize: 15, fontWeight: 700, color: '#166534' }}>
                 {col}
               </span>
             ))}
@@ -962,7 +962,7 @@ export default function Donors() {
 
           {/* Rows */}
           {loading && donors.length === 0 && (
-            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '40px 0', fontSize: 14 }}>
+            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '40px 0', fontSize: 18 }}>
               লোড হচ্ছে...
             </p>
           )}
@@ -984,17 +984,17 @@ export default function Donors() {
               >
                 <SerialBadge number={donor.serial_number} />
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{donor.name}</div>
+                  <div style={{ fontSize: 18, fontWeight: 600, color: '#111827' }}>{donor.name}</div>
                 </div>
-                <div style={{ fontSize: 13, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 17, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {donor.address}
                 </div>
-                <div style={{ fontSize: 13, color: '#374151' }}>{formatMoney(donor.monthly_amount)}</div>
+                <div style={{ fontSize: 17, color: '#374151' }}>{formatMoney(donor.monthly_amount)}</div>
                 <div>
                   {isPaid ? (
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#16a34a' }}>পরিশোধিত</span>
+                    <span style={{ fontSize: 16, fontWeight: 600, color: '#16a34a' }}>পরিশোধিত</span>
                   ) : (
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>
+                    <span style={{ fontSize: 17, fontWeight: 700, color: '#ef4444' }}>
                       {formatMoney(donor.balance)}
                     </span>
                   )}
@@ -1010,7 +1010,7 @@ export default function Donors() {
                       borderRadius: 8,
                       height: 32,
                       padding: '0 12px',
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
@@ -1027,7 +1027,7 @@ export default function Donors() {
                       borderRadius: 8,
                       height: 32,
                       padding: '0 12px',
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
@@ -1045,7 +1045,7 @@ export default function Donors() {
                         borderRadius: 8,
                         height: 32,
                         padding: '0 12px',
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: 600,
                         cursor: 'pointer',
                       }}
@@ -1070,7 +1070,7 @@ export default function Donors() {
             top: 88,
           }}
         >
-          <h2 style={{ margin: '0 0 20px', fontSize: 17, fontWeight: 700, color: '#111827' }}>
+          <h2 style={{ margin: '0 0 20px', fontSize: 21, fontWeight: 700, color: '#111827' }}>
             {editingDonor ? 'দাতা আপডেট' : 'নতুন দাতা যোগ করুন'}
           </h2>
           <FormPanel

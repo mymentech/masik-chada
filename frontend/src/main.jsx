@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ApolloProvider client={apolloClient}>
       <AuthProvider>
         <MobileProvider>
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <App />
           </BrowserRouter>
         </MobileProvider>

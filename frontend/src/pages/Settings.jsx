@@ -34,7 +34,7 @@ export default function Settings() {
   return (
     <div style={{ background: '#f9fafb', minHeight: '100svh', padding: isMobile ? 16 : '24px 0' }}>
       <div className={isMobile ? '' : 'container'} style={{ display: 'grid', gap: 16, maxWidth: 720 }}>
-        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>সেটিংস</h1>
+        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>সেটিংস</h1>
 
         {notice.text && (
           <div
@@ -44,7 +44,7 @@ export default function Settings() {
               color: notice.type === 'error' ? '#991b1b' : '#166534',
               borderRadius: 10,
               padding: '10px 14px',
-              fontSize: 14,
+              fontSize: 18,
             }}
           >
             {notice.text}
@@ -69,10 +69,10 @@ export default function Settings() {
             }}
           >
             <div style={{ flex: 1, minWidth: 220 }}>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#111827' }}>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>
                 দাতা ডিলিট বাটন
               </h2>
-              <p style={{ margin: '6px 0 0', color: '#6b7280', fontSize: 13, lineHeight: 1.6 }}>
+              <p style={{ margin: '6px 0 0', color: '#6b7280', fontSize: 17, lineHeight: 1.6 }}>
                 বন্ধ থাকলে দাতা ম্যানেজমেন্ট পেজে Delete বাটন দেখানো হবে না এবং ডিলিট অপারেশন সার্ভার থেকেও
                 ব্লক থাকবে। ভুলবশত দাতার তথ্য মুছে যাওয়া রোধ করতে এটি ডিফল্টভাবে বন্ধ।
               </p>
@@ -86,7 +86,7 @@ export default function Settings() {
                 opacity: state.loading ? 0.6 : 1,
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 600, color: allowDelete ? '#15803d' : '#6b7280' }}>
+              <span style={{ fontSize: 17, fontWeight: 600, color: allowDelete ? '#15803d' : '#6b7280' }}>
                 {allowDelete ? 'চালু' : 'বন্ধ'}
               </span>
               <span

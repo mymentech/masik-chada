@@ -1,4 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'NikoshBAN';
+  src: url('/fonts/NikoshBAN.eot');
+  src: url('/fonts/NikoshBAN.eot?#iefix') format('embedded-opentype'),
+       url('/fonts/NikoshBAN.woff2') format('woff2'),
+       url('/fonts/NikoshBAN.woff') format('woff'),
+       url('/fonts/NikoshBAN.ttf') format('truetype'),
+       url('/fonts/NikoshBAN.svg#NikoshBAN') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
 
 :root {
   --green-50:  #f0fdf4;
@@ -42,8 +53,8 @@ body {
   padding: 0;
   background: var(--gray-50);
   color: var(--gray-900);
-  font-family: 'Hind Siliguri', sans-serif;
-  font-size: 15px;
+  font-family: 'NikoshBAN', sans-serif;
+  font-size: 22px;
   line-height: 1.5;
 }
 
@@ -156,13 +167,219 @@ button, input, select, textarea {
 
 /* Print */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm 18mm 12mm;
+
+    @bottom-right {
+      content: "পৃষ্ঠা " counter(page) " / " counter(pages);
+      font-size: 9pt;
+      color: #000;
+    }
+
+    @bottom-left {
+      content: "মাস: " string(pMonth) " · প্রিন্ট: " string(pDate);
+      font-size: 9pt;
+      color: #000;
+    }
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   .topbar,
   .bottom-nav-bar,
+  .no-print,
   button:not([data-print-show]) {
     display: none !important;
   }
 
-  body {
-    background: white;
+  /* Reveal elements that are only meant for printing.
+     Use `revert` so each element falls back to its own tag/class display
+     (grid, table, block, etc.) instead of being forced to `block`. */
+  .print-only {
+    display: revert !important;
   }
+
+  /* Kill screen-only chrome: shadows, rounded corners, gradients, sticky positioning */
+  .print-area,
+  .print-area * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    position: static !important;
+  }
+
+  .print-area {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Document header */
+  .print-doc-header {
+    display: block;
+    border-bottom: 2pt solid #000;
+    padding-bottom: 8pt;
+    margin-bottom: 12pt;
+  }
+
+  .print-doc-header h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    margin: 0;
+    color: #000;
+    letter-spacing: 0.2pt;
+  }
+
+  .print-doc-header .subtitle {
+    font-size: 10pt;
+    color: #000;
+    margin: 3pt 0 0;
+    letter-spacing: 0.3pt;
+  }
+
+  .print-doc-header .meta {
+    font-size: 9.5pt;
+    color: #000;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6pt;
+  }
+
+  /* Print-only summary grid */
+  .print-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8pt;
+    margin-bottom: 14pt;
+    page-break-inside: avoid;
+  }
+
+  .print-summary .cell {
+    border: 0.75pt solid #000;
+    border-left: 3pt solid #000;
+    padding: 8pt 10pt;
+    background: #ffffff !important;
+  }
+
+  .print-summary .cell .label {
+    font-size: 9pt;
+    color: #000;
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.2pt;
+  }
+
+  .print-summary .cell .value {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #000;
+    margin: 4pt 0 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Print-only tables: real <table> so <thead> repeats on every page */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+    margin-bottom: 14pt;
+    page-break-inside: auto;
+  }
+
+  .print-table caption {
+    caption-side: top;
+    text-align: left;
+    font-size: 12pt;
+    font-weight: 700;
+    padding: 0 0 6pt;
+    color: #000;
+    border-bottom: 0.5pt solid #888;
+    margin-bottom: 4pt;
+    letter-spacing: 0.2pt;
+  }
+
+  /* Repeat the column header on every printed page */
+  .print-table thead {
+    display: table-header-group;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 0.4pt solid #999;
+    padding: 5pt 7pt;
+    vertical-align: middle;
+    color: #000;
+    background: #ffffff !important;
+  }
+
+  .print-table thead th {
+    background: #d9d9d9 !important;
+    font-weight: 700;
+    text-align: left;
+    font-size: 10pt;
+    border: 0.5pt solid #000;
+    border-bottom: 1pt solid #000;
+    padding: 6pt 7pt;
+  }
+
+  .print-table tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .print-table tbody tr:nth-child(even) td {
+    background: #f4f4f4 !important;
+  }
+
+  /* Total row — last row of <tbody>, so it appears only once on the last page */
+  .print-table tbody tr.total-row td {
+    background: #d9d9d9 !important;
+    font-weight: 700;
+    font-size: 11pt;
+    border-top: 1pt solid #000;
+    border-bottom: 1pt solid #000;
+    padding: 7pt 7pt;
+  }
+
+  .print-table .num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .print-table .serial {
+    text-align: center;
+    width: 10%;
+  }
+
+  .print-footer-note {
+    margin-top: 6pt;
+    font-size: 9pt;
+    color: #000;
+    text-align: right;
+  }
+}
+
+/* By default, print-only blocks are hidden on screen */
+.print-only {
+  display: none;
+}
+
+/* `string-set` captures these values into named strings so the
+   @page @bottom-left margin box can render them on every printed page.
+   Applied to the visible header meta spans so the element is guaranteed
+   to be laid out (empty/hidden elements don't update string-set). */
+.pMonth {
+  string-set: pMonth content(text);
+}
+
+.pDate {
+  string-set: pDate content(text);
 }

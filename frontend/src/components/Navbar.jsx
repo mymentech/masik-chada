@@ -41,10 +41,10 @@ export default function Navbar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <LogoMark size={34} />
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#166534', lineHeight: 1.1 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#166534', lineHeight: 1.1 }}>
               ময়দানে মুহাম্মাদ
             </div>
-            <div style={{ fontSize: 10, color: '#16a34a', letterSpacing: '0.3px' }}>
+            <div style={{ fontSize: 14, color: '#16a34a', letterSpacing: '0.3px' }}>
               Maidan-e-Muhammad
             </div>
           </div>
@@ -62,7 +62,7 @@ export default function Navbar() {
               style={({ isActive }) => ({
                 padding: '6px 14px',
                 borderRadius: 999,
-                fontSize: 14,
+                fontSize: 18,
                 fontWeight: isActive ? 600 : 400,
                 color: isActive ? '#166534' : '#6b7280',
                 background: isActive ? '#f0fdf4' : 'transparent',
@@ -111,10 +111,10 @@ export default function Navbar() {
             </div>
             {activeUser?.name && (
               <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', lineHeight: 1.2 }}>
+                <div style={{ fontSize: 17, fontWeight: 600, color: '#374151', lineHeight: 1.2 }}>
                   {activeUser.name}
                 </div>
-                <div style={{ fontSize: 11, color: '#9ca3af', lineHeight: 1.2 }}>
+                <div style={{ fontSize: 15, color: '#9ca3af', lineHeight: 1.2 }}>
                   {isAdmin ? 'অ্যাডমিন' : 'কালেক্টর'}
                 </div>
               </div>
@@ -140,7 +140,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); navigate('/profile'); setMenuOpen(false); }}
-                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#374151', cursor: 'pointer' }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 18, color: '#374151', cursor: 'pointer' }}
               >
                 আমার প্রোফাইল
               </button>
@@ -149,14 +149,14 @@ export default function Navbar() {
                   <button
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); navigate('/users'); setMenuOpen(false); }}
-                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#374151', cursor: 'pointer' }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 18, color: '#374151', cursor: 'pointer' }}
                   >
                     ইউজার ম্যানেজমেন্ট
                   </button>
                   <button
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); navigate('/settings'); setMenuOpen(false); }}
-                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#374151', cursor: 'pointer' }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 18, color: '#374151', cursor: 'pointer' }}
                   >
                     সেটিংস
                   </button>
@@ -166,7 +166,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); logout(); navigate('/login', { replace: true }); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 14, color: '#4f46e5', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: 'transparent', border: 0, padding: '10px 12px', borderRadius: 8, fontSize: 18, color: '#4f46e5', cursor: 'pointer' }}
               >
                 <LogOut size={14} />
                 লগআউট
@@ -190,7 +190,7 @@ export default function Navbar() {
               borderRadius: 8,
               padding: '8px 14px',
               fontWeight: 600,
-              fontSize: 13,
+              fontSize: 17,
               cursor: 'pointer',
               minHeight: 36,
             }}

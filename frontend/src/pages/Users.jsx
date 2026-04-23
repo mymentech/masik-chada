@@ -17,11 +17,11 @@ const inputStyle = {
   border: '1.5px solid #d1d5db',
   background: '#f9fafb',
   padding: '0 12px',
-  fontSize: 14,
+  fontSize: 18,
   outline: 'none',
 };
 
-const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 };
+const labelStyle = { display: 'block', fontSize: 16, fontWeight: 600, color: '#374151', marginBottom: 4 };
 
 function Sheet({ open, onClose, title, children }) {
   if (!open) return null;
@@ -53,8 +53,8 @@ function Sheet({ open, onClose, title, children }) {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#111827' }}>{title}</h2>
-          <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: 22, cursor: 'pointer', color: '#6b7280' }}>×</button>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>{title}</h2>
+          <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: 26, cursor: 'pointer', color: '#6b7280' }}>×</button>
         </div>
         <div style={{ padding: 20 }}>{children}</div>
       </div>
@@ -71,7 +71,7 @@ function roleBadge(role) {
         color: isAdmin ? '#92400e' : '#166534',
         borderRadius: 999,
         padding: '3px 10px',
-        fontSize: 11,
+        fontSize: 15,
         fontWeight: 700,
       }}
     >
@@ -202,7 +202,7 @@ export default function Users() {
     <div style={{ background: '#f9fafb', minHeight: '100svh', padding: isMobile ? 16 : '24px 0' }}>
       <div className={isMobile ? '' : 'container'} style={{ display: 'grid', gap: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>ইউজার ম্যানেজমেন্ট</h1>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>ইউজার ম্যানেজমেন্ট</h1>
           <button
             type="button"
             onClick={() => setCreating(true)}
@@ -214,7 +214,7 @@ export default function Users() {
               border: 0,
               borderRadius: 10,
               fontWeight: 600,
-              fontSize: 14,
+              fontSize: 18,
               cursor: 'pointer',
             }}
           >
@@ -230,7 +230,7 @@ export default function Users() {
               color: notice.type === 'error' ? '#991b1b' : '#166534',
               borderRadius: 10,
               padding: '10px 14px',
-              fontSize: 14,
+              fontSize: 18,
             }}
           >
             {notice.text}
@@ -248,7 +248,7 @@ export default function Users() {
                 gap: 8,
                 padding: '12px 20px',
                 background: '#f0fdf4',
-                fontSize: 11,
+                fontSize: 15,
                 fontWeight: 700,
                 color: '#166534',
               }}
@@ -262,7 +262,7 @@ export default function Users() {
           )}
 
           {loading && users.length === 0 && (
-            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '32px 0', fontSize: 14 }}>লোড হচ্ছে...</p>
+            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '32px 0', fontSize: 18 }}>লোড হচ্ছে...</p>
           )}
 
           {users.map((u, idx) =>
@@ -271,16 +271,16 @@ export default function Users() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 600, color: '#111827' }}>{u.name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280' }}>{u.email}</div>
-                    <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{u.phone}</div>
+                    <div style={{ fontSize: 16, color: '#6b7280' }}>{u.email}</div>
+                    <div style={{ fontSize: 16, color: '#9ca3af', marginTop: 2 }}>{u.phone}</div>
                     <div style={{ marginTop: 6 }}>{roleBadge(u.role)}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-                  <button type="button" onClick={() => setEditing(u)} style={{ background: '#dbeafe', color: '#2563eb', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>এডিট</button>
-                  <button type="button" onClick={() => setResetting(u)} style={{ background: '#fef3c7', color: '#92400e', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>পাসওয়ার্ড রিসেট</button>
+                  <button type="button" onClick={() => setEditing(u)} style={{ background: '#dbeafe', color: '#2563eb', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>এডিট</button>
+                  <button type="button" onClick={() => setResetting(u)} style={{ background: '#fef3c7', color: '#92400e', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>পাসওয়ার্ড রিসেট</button>
                   {String(me?.id) !== String(u.id) && (
-                    <button type="button" onClick={() => openDeleteFlow(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
+                    <button type="button" onClick={() => openDeleteFlow(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 12px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
                   )}
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function Users() {
                   alignItems: 'center',
                   background: idx % 2 === 0 ? '#fff' : '#f9fafb',
                   borderBottom: '1px solid #f3f4f6',
-                  fontSize: 13,
+                  fontSize: 17,
                 }}
               >
                 <span style={{ fontWeight: 600, color: '#111827' }}>{u.name}</span>
@@ -303,10 +303,10 @@ export default function Users() {
                 <span style={{ color: '#374151' }}>{u.phone}</span>
                 <span>{roleBadge(u.role)}</span>
                 <span style={{ display: 'flex', gap: 6 }}>
-                  <button type="button" onClick={() => setEditing(u)} style={{ background: '#dbeafe', color: '#2563eb', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>এডিট</button>
-                  <button type="button" onClick={() => setResetting(u)} style={{ background: '#fef3c7', color: '#92400e', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>রিসেট</button>
+                  <button type="button" onClick={() => setEditing(u)} style={{ background: '#dbeafe', color: '#2563eb', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>এডিট</button>
+                  <button type="button" onClick={() => setResetting(u)} style={{ background: '#fef3c7', color: '#92400e', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>রিসেট</button>
                   {String(me?.id) !== String(u.id) && (
-                    <button type="button" onClick={() => openDeleteFlow(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
+                    <button type="button" onClick={() => openDeleteFlow(u)} style={{ background: '#fee2e2', color: '#ef4444', border: 0, borderRadius: 8, padding: '6px 10px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>ডিলিট</button>
                   )}
                 </span>
               </div>
@@ -340,7 +340,7 @@ export default function Users() {
             <label style={labelStyle}>পাসওয়ার্ড (ন্যূনতম ৬)</label>
             <input name="password" type="password" required minLength={6} className="ds-input" style={inputStyle} />
           </div>
-          <button type="submit" disabled={createState.loading} style={{ height: 44, background: '#16a34a', color: '#fff', border: 0, borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+          <button type="submit" disabled={createState.loading} style={{ height: 44, background: '#16a34a', color: '#fff', border: 0, borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 18 }}>
             {createState.loading ? 'তৈরি হচ্ছে...' : 'ইউজার তৈরি করুন'}
           </button>
         </form>
@@ -368,7 +368,7 @@ export default function Users() {
                 <option value="Admin">অ্যাডমিন</option>
               </select>
             </div>
-            <button type="submit" disabled={updateState.loading} style={{ height: 44, background: '#16a34a', color: '#fff', border: 0, borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+            <button type="submit" disabled={updateState.loading} style={{ height: 44, background: '#16a34a', color: '#fff', border: 0, borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 18 }}>
               {updateState.loading ? 'সংরক্ষণ হচ্ছে...' : 'আপডেট করুন'}
             </button>
           </form>
@@ -382,7 +382,7 @@ export default function Users() {
               <label style={labelStyle}>নতুন পাসওয়ার্ড (ন্যূনতম ৬)</label>
               <input name="password" type="password" required minLength={6} className="ds-input" style={inputStyle} />
             </div>
-            <button type="submit" disabled={resetState.loading} style={{ height: 44, background: '#f59e0b', color: '#fff', border: 0, borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>
+            <button type="submit" disabled={resetState.loading} style={{ height: 44, background: '#f59e0b', color: '#fff', border: 0, borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 18 }}>
               {resetState.loading ? 'রিসেট হচ্ছে...' : 'পাসওয়ার্ড সেট করুন'}
             </button>
           </form>
@@ -394,11 +394,11 @@ export default function Users() {
           setDeleteTarget(null);
           setReassignToUserId('');
         }}
-        title={`Delete User � ${deleteTarget?.name || ''}`}
+        title={`Delete User - ${deleteTarget?.name || ''}`}
       >
         {deleteTarget && (
           <div style={{ display: 'grid', gap: 12 }}>
-            <p style={{ margin: 0, color: '#6b7280', fontSize: 13, lineHeight: 1.6 }}>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: 17, lineHeight: 1.6 }}>
               Reassign this user's payment records to another user before deleting the account.
             </p>
             <div>
@@ -430,7 +430,7 @@ export default function Users() {
                 borderRadius: 10,
                 fontWeight: 600,
                 cursor: !reassignToUserId ? 'not-allowed' : 'pointer',
-                fontSize: 14,
+                fontSize: 18,
                 opacity: !reassignToUserId ? 0.6 : 1,
               }}
             >
@@ -442,4 +442,3 @@ export default function Users() {
     </div>
   );
 }
-
