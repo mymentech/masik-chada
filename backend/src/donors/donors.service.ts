@@ -4,7 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Payment } from '../payments/entities/payment.entity';
 import { calculateOutstandingBalance, calculateTotalDue, monthBounds, toIsoDate } from '../utils/calculate-dues';
 import { DonorInput } from './dto/donor.input';
-import { DonorBalance, DonorsSummaryRow } from './dto/donor-balance.type';
+import { DonorBalance, DonorsPage, DonorsSummaryRow } from './dto/donor-balance.type';
 import { Donor } from './entities/donor.entity';
 
 @Injectable()
@@ -16,28 +16,39 @@ export class DonorsService {
   ) {}
 
   async donors(search?: string, address?: string): Promise<DonorBalance[]> {
-    const qb = this.donorRepo.createQueryBuilder('d').orderBy('d.serial_number', 'ASC');
-
-    if (address) {
-      qb.andWhere('d.address = :address', { address });
-    }
-
-    if (search) {
-      const serial = Number(search);
-      if (Number.isInteger(serial) && String(serial) === search.trim()) {
-        qb.andWhere('(d.serial_number = :serial OR d.name ILIKE :searchPat)', {
-          serial,
-          searchPat: `%${search.trim()}%`,
-        });
-      } else {
-        qb.andWhere('d.name ILIKE :searchPat', { searchPat: `%${search.trim()}%` });
-      }
-    }
-
+    const qb = this.buildDonorsQuery(search, address);
     const donors = await qb.getMany();
     const paidMap = await this.paymentTotalsByDonor();
 
     return donors.map((donor) => this.toDonorBalance(donor, paidMap));
+  }
+
+  async donorsPage(
+    search?: string,
+    address?: string,
+    offset = 0,
+    limit = 40,
+  ): Promise<DonorsPage> {
+    const safeOffset = Number.isFinite(offset) && offset > 0 ? Math.floor(offset) : 0;
+    const safeLimit = Number.isFinite(limit)
+      ? Math.max(1, Math.min(100, Math.floor(limit)))
+      : 40;
+
+    const baseQb = this.buildDonorsQuery(search, address);
+    const total = await baseQb.getCount();
+
+    const donors = await baseQb.clone().skip(safeOffset).take(safeLimit).getMany();
+    const donorIds = donors.map((d) => Number(d.id));
+    const paidMap = await this.paymentTotalsByDonorIds(donorIds);
+    const items = donors.map((donor) => this.toDonorBalance(donor, paidMap));
+
+    return {
+      items,
+      total,
+      offset: safeOffset,
+      limit: safeLimit,
+      hasMore: safeOffset + items.length < total,
+    };
   }
 
   async donor(id: string): Promise<DonorBalance> {
@@ -176,6 +187,48 @@ export class DonorsService {
       map.set(Number(row.donor_id), Number(row.total || 0));
     });
     return map;
+  }
+
+  private async paymentTotalsByDonorIds(donorIds: number[]): Promise<Map<number, number>> {
+    if (donorIds.length === 0) {
+      return new Map();
+    }
+
+    const rows = await this.paymentRepo
+      .createQueryBuilder('p')
+      .select('p.donor_id', 'donor_id')
+      .addSelect('SUM(p.amount)', 'total')
+      .where('p.donor_id IN (:...donorIds)', { donorIds })
+      .groupBy('p.donor_id')
+      .getRawMany<{ donor_id: string; total: string }>();
+
+    const map = new Map<number, number>();
+    rows.forEach((row) => {
+      map.set(Number(row.donor_id), Number(row.total || 0));
+    });
+    return map;
+  }
+
+  private buildDonorsQuery(search?: string, address?: string) {
+    const qb = this.donorRepo.createQueryBuilder('d').orderBy('d.serial_number', 'ASC');
+
+    if (address) {
+      qb.andWhere('d.address = :address', { address });
+    }
+
+    if (search) {
+      const serial = Number(search);
+      if (Number.isInteger(serial) && String(serial) === search.trim()) {
+        qb.andWhere('(d.serial_number = :serial OR d.name ILIKE :searchPat)', {
+          serial,
+          searchPat: `%${search.trim()}%`,
+        });
+      } else {
+        qb.andWhere('d.name ILIKE :searchPat', { searchPat: `%${search.trim()}%` });
+      }
+    }
+
+    return qb;
   }
 
   private toDonorBalance(donor: Donor, paidMap: Map<number, number>): DonorBalance {

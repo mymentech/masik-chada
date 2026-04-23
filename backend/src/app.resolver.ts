@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth/auth.service';
 import { LoginResponse } from './auth/auth.types';
 import { CurrentUser, type AuthContextUser } from './common/decorators/current-user.decorator';
@@ -7,7 +7,12 @@ import { Roles } from './common/decorators/roles.decorator';
 import { DashboardService } from './dashboard/dashboard.service';
 import { DashboardSummary } from './dashboard/dashboard.type';
 import { DonorsService } from './donors/donors.service';
-import { DonorBalance, DonorsSummaryRow, DeleteDonorResult } from './donors/dto/donor-balance.type';
+import {
+  DonorBalance,
+  DonorsSummaryRow,
+  DeleteDonorResult,
+  DonorsPage,
+} from './donors/dto/donor-balance.type';
 import { DonorInput } from './donors/dto/donor.input';
 import { Payment } from './payments/entities/payment.entity';
 import { RecordPaymentResult } from './payments/dto/record-payment-result.type';
@@ -61,6 +66,16 @@ export class AppResolver {
     @Args('address', { nullable: true }) address?: string,
   ) {
     return this.donorsService.donors(search, address);
+  }
+
+  @Query(() => DonorsPage)
+  donorsPage(
+    @Args('search', { nullable: true }) search?: string,
+    @Args('address', { nullable: true }) address?: string,
+    @Args('offset', { nullable: true, type: () => Int }) offset?: number,
+    @Args('limit', { nullable: true, type: () => Int }) limit?: number,
+  ) {
+    return this.donorsService.donorsPage(search, address, offset, limit);
   }
 
   @Query(() => DonorBalance)

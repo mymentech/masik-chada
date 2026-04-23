@@ -71,3 +71,21 @@ export class DeleteDonorResult {
   @Field()
   message!: string;
 }
+
+@ObjectType()
+export class DonorsPage {
+  @Field(() => [DonorBalance])
+  items!: DonorBalance[];
+
+  @Field(() => Int)
+  total!: number;
+
+  @Field(() => Int)
+  offset!: number;
+
+  @Field(() => Int)
+  limit!: number;
+
+  @Field()
+  hasMore!: boolean;
+}
