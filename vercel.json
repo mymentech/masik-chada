@@ -11,8 +11,9 @@
   "installCommand": "echo 'deps installed per sub-project'",
   "functions": {
     "api/index.js": {
+      "runtime": "nodejs20.x",
       "includeFiles": "backend/dist/**",
-      "memory": 512,
+      "memory": 1024,
       "maxDuration": 30
     }
   },
