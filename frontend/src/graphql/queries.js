@@ -29,6 +29,30 @@ export const DONORS_QUERY = gql`
   }
 `;
 
+export const DONORS_PAGE_QUERY = gql`
+  query DonorsPage($search: String, $address: String, $offset: Int, $limit: Int) {
+    donorsPage(search: $search, address: $address, offset: $offset, limit: $limit) {
+      items {
+        id
+        serial_number
+        name
+        phone
+        address
+        monthly_amount
+        registration_date
+        due_from
+        total_due
+        total_paid
+        balance
+      }
+      total
+      offset
+      limit
+      hasMore
+    }
+  }
+`;
+
 export const DONOR_QUERY = gql`
   query Donor($id: String!) {
     donor(id: $id) {

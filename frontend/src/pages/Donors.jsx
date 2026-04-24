@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   CREATE_DONOR_MUTATION,
   DELETE_DONOR_MUTATION,
   UPDATE_DONOR_MUTATION,
 } from '../graphql/mutations';
-import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_PAGE_QUERY } from '../graphql/queries';
 import { useIsMobile } from '../context/MobileContext';
+import { useInfiniteDonors } from '../hooks/useInfiniteDonors';
 import PaymentHistory from '../components/PaymentHistory';
 
 function todayDateOnly() {
@@ -414,21 +415,22 @@ export default function Donors() {
   const [viewingDonor, setViewingDonor] = useState(null);
 
   const searchText = search.trim();
-  const variables = useMemo(
-    () => ({ search: searchText || undefined, address: undefined }),
-    [searchText]
-  );
 
-  const { data, loading, error } = useQuery(DONORS_QUERY, {
+  const {
+    items: donors,
+    loading,
+    loadingMore,
+    error,
+    hasMore,
+    total,
+    sentinelRef,
     variables,
-    fetchPolicy: 'cache-and-network',
-  });
+  } = useInfiniteDonors({ search: searchText, address: undefined });
+
   const { data: settingsData } = useQuery(APP_SETTINGS_QUERY, {
     fetchPolicy: 'cache-and-network',
   });
   const allowDelete = Boolean(settingsData?.appSettings?.allow_donor_delete);
-
-  const donors = data?.donors || [];
 
   const [createDonor, createState] = useMutation(CREATE_DONOR_MUTATION);
   const [updateDonor, updateState] = useMutation(UPDATE_DONOR_MUTATION);
@@ -489,7 +491,7 @@ export default function Donors() {
         await updateDonor({
           variables: { id: editingDonor.id, input },
           refetchQueries: [
-            { query: DONORS_QUERY, variables },
+            { query: DONORS_PAGE_QUERY, variables },
             { query: DASHBOARD_SUMMARY_QUERY },
           ],
           awaitRefetchQueries: true,
@@ -499,7 +501,7 @@ export default function Donors() {
         await createDonor({
           variables: { input },
           refetchQueries: [
-            { query: DONORS_QUERY, variables },
+            { query: DONORS_PAGE_QUERY, variables },
             { query: DASHBOARD_SUMMARY_QUERY },
           ],
           awaitRefetchQueries: true,
@@ -525,7 +527,7 @@ export default function Donors() {
       const result = await deleteDonor({
         variables: { id: donor.id },
         refetchQueries: [
-          { query: DONORS_QUERY, variables },
+          { query: DONORS_PAGE_QUERY, variables },
           { query: DASHBOARD_SUMMARY_QUERY },
         ],
         awaitRefetchQueries: true,
@@ -562,7 +564,7 @@ export default function Donors() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
               দাতা ম্যানেজমেন্ট
-              {donors.length > 0 && (
+              {total > 0 && (
                 <span
                   style={{
                     marginLeft: 8,
@@ -574,7 +576,7 @@ export default function Donors() {
                     fontWeight: 600,
                   }}
                 >
-                  {donors.length}
+                  {total}
                 </span>
               )}
             </h1>
@@ -749,6 +751,15 @@ export default function Donors() {
               </div>
             );
           })}
+
+          {hasMore && (
+            <div
+              ref={sentinelRef}
+              style={{ textAlign: 'center', color: '#9ca3af', padding: '16px 0', fontSize: 16 }}
+            >
+              {loadingMore ? 'আরও লোড হচ্ছে...' : ''}
+            </div>
+          )}
         </div>
 
         {/* Form bottom sheet */}
@@ -1057,6 +1068,15 @@ export default function Donors() {
               </div>
             );
           })}
+
+          {hasMore && (
+            <div
+              ref={sentinelRef}
+              style={{ textAlign: 'center', color: '#9ca3af', padding: '16px 0', fontSize: 16 }}
+            >
+              {loadingMore ? 'আরও লোড হচ্ছে...' : ''}
+            </div>
+          )}
         </div>
 
         {/* Right — form panel */}

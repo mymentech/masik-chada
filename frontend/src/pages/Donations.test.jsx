@@ -3,17 +3,36 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Donations from './Donations';
 import { RECORD_PAYMENT_MUTATION } from '../graphql/mutations';
 import { afterEach, vi } from 'vitest';
-import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY, DONOR_PAYMENTS_QUERY } from '../graphql/queries';
+import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_PAGE_QUERY, DONOR_PAYMENTS_QUERY } from '../graphql/queries';
+import { DONORS_PAGE_SIZE } from '../hooks/useInfiniteDonors';
 
-function donorQueryMock(donors, variables = { search: undefined, address: undefined }) {
+function baseVariables(overrides = {}) {
+  return {
+    search: undefined,
+    address: undefined,
+    offset: 0,
+    limit: DONORS_PAGE_SIZE,
+    ...overrides
+  };
+}
+
+function donorsPageMock(donors, variableOverrides = {}) {
+  const variables = baseVariables(variableOverrides);
   return {
     request: {
-      query: DONORS_QUERY,
+      query: DONORS_PAGE_QUERY,
       variables
     },
     result: {
       data: {
-        donors
+        donorsPage: {
+          __typename: 'DonorsPage',
+          items: donors,
+          total: donors.length,
+          offset: variables.offset,
+          limit: variables.limit,
+          hasMore: false
+        }
       }
     }
   };
@@ -89,9 +108,11 @@ describe('Donations page', () => {
     const paymentDate = '2026-04-01';
     const expectedPaymentDateIso = '2026-04-01T00:00:00.000Z';
 
+    const updatedDonor = { ...donor, total_paid: 2700, balance: 0 };
+
     const mocks = [
       addressesQueryMock(['চট্টগ্রাম']),
-      donorQueryMock([donor]),
+      donorsPageMock([donor]),
       {
         request: {
           query: RECORD_PAYMENT_MUTATION,
@@ -104,18 +125,29 @@ describe('Donations page', () => {
         result: {
           data: {
             recordPayment: {
-              __typename: 'PaymentType',
-              id: 'payment-1',
-              donor_id: donor.id,
-              amount: 700,
-              payment_date: expectedPaymentDateIso,
-              created_at: '2026-04-01T10:00:00.000Z'
+              __typename: 'RecordPaymentResult',
+              payment: {
+                __typename: 'PaymentType',
+                id: 'payment-1',
+                donor_id: donor.id,
+                amount: 700,
+                payment_date: expectedPaymentDateIso,
+                created_at: '2026-04-01T10:00:00.000Z'
+              },
+              donor: updatedDonor,
+              dashboard: {
+                __typename: 'DashboardType',
+                totalDonors: 1,
+                thisMonthCollected: 700,
+                totalBalance: 0,
+                totalCollectors: 1
+              }
             }
           }
-      }
+        }
       },
-      donorQueryMock([donor]),
-      donorQueryMock([donor]),
+      donorsPageMock([updatedDonor]),
+      donorsPageMock([updatedDonor]),
       dashboardSummaryMock(),
       donorPaymentsMock(donor.id),
       donorPaymentsMock(donor.id)
@@ -149,7 +181,7 @@ describe('Donations page', () => {
 
     const mocks = [
       addressesQueryMock(['চট্টগ্রাম']),
-      donorQueryMock([donor]),
+      donorsPageMock([donor]),
       donorPaymentsMock(donor.id),
       {
         request: {
@@ -189,8 +221,8 @@ describe('Donations page', () => {
   it('applies 300ms debounced search before requesting donors', async () => {
     const mocks = [
       addressesQueryMock(['ঢাকা']),
-      donorQueryMock([]),
-      donorQueryMock([donor], { search: 'করিম', address: undefined })
+      donorsPageMock([]),
+      donorsPageMock([donor], { search: 'করিম' })
     ];
 
     render(
@@ -218,8 +250,8 @@ describe('Donations page', () => {
     const dhakaDonor = { ...donor, id: 'donor-2', name: 'ঢাকা ডোনার', address: 'ঢাকা' };
     const mocks = [
       addressesQueryMock(['ঢাকা', 'চট্টগ্রাম']),
-      donorQueryMock([donor, dhakaDonor]),
-      donorQueryMock([dhakaDonor], { search: undefined, address: 'ঢাকা' })
+      donorsPageMock([donor, dhakaDonor]),
+      donorsPageMock([dhakaDonor], { address: 'ঢাকা' })
     ];
 
     render(

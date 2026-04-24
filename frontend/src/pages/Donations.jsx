@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { RECORD_PAYMENT_MUTATION } from '../graphql/mutations';
-import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY, DONOR_PAYMENTS_QUERY } from '../graphql/queries';
+import { ADDRESSES_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_PAGE_QUERY, DONOR_PAYMENTS_QUERY } from '../graphql/queries';
 import { useIsMobile } from '../context/MobileContext';
+import { useInfiniteDonors } from '../hooks/useInfiniteDonors';
 import PaymentHistory from '../components/PaymentHistory';
 
 function formatMoney(value) {
@@ -73,21 +74,19 @@ export default function Donations() {
   const toastTimerRef = useRef(null);
 
   const debouncedSearch = useDebouncedValue(search.trim(), 300);
-  const variables = useMemo(
-    () => ({
-      search: debouncedSearch || undefined,
-      address: address || undefined,
-    }),
-    [debouncedSearch, address]
-  );
 
-  const { data, loading, error } = useQuery(DONORS_QUERY, {
+  const {
+    items: donors,
+    loading,
+    loadingMore,
+    error,
+    hasMore,
+    sentinelRef,
     variables,
-    fetchPolicy: 'cache-and-network',
-  });
+  } = useInfiniteDonors({ search: debouncedSearch, address });
+
   const { data: addressesData } = useQuery(ADDRESSES_QUERY, { fetchPolicy: 'cache-first' });
 
-  const donors = data?.donors || [];
   const addresses = addressesData?.addresses || [];
   const selectedDonor = donors.find((d) => d.id === selectedDonorId) || null;
 
@@ -138,7 +137,7 @@ export default function Donations() {
           paymentDate: toGraphqlDate(paymentDate),
         },
         refetchQueries: [
-          { query: DONORS_QUERY, variables },
+          { query: DONORS_PAGE_QUERY, variables },
           { query: DASHBOARD_SUMMARY_QUERY },
           { query: DONOR_PAYMENTS_QUERY, variables: { donorId: selectedDonor.id } },
         ],
@@ -429,6 +428,15 @@ export default function Donations() {
             </button>
           );
         })}
+
+        {hasMore && (
+          <div
+            ref={sentinelRef}
+            style={{ textAlign: 'center', color: '#9ca3af', padding: '16px 0', fontSize: 16 }}
+          >
+            {loadingMore ? 'আরও লোড হচ্ছে...' : ''}
+          </div>
+        )}
       </div>
 
       {/* Payment popup — slide-up sheet on mobile, centered modal on desktop */}

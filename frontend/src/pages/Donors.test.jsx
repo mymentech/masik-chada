@@ -7,19 +7,32 @@ import {
   DELETE_DONOR_MUTATION,
   UPDATE_DONOR_MUTATION
 } from '../graphql/mutations';
-import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_QUERY } from '../graphql/queries';
+import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_PAGE_QUERY } from '../graphql/queries';
+import { DONORS_PAGE_SIZE } from '../hooks/useInfiniteDonors';
 
-const queryVariables = { search: undefined, address: undefined };
+const baseVariables = {
+  search: undefined,
+  address: undefined,
+  offset: 0,
+  limit: DONORS_PAGE_SIZE
+};
 
-function donorsQueryMock(donors) {
+function donorsPageMock(items, variables = baseVariables) {
   return {
     request: {
-      query: DONORS_QUERY,
-      variables: queryVariables
+      query: DONORS_PAGE_QUERY,
+      variables
     },
     result: {
       data: {
-        donors
+        donorsPage: {
+          __typename: 'DonorsPage',
+          items,
+          total: items.length,
+          offset: variables.offset || 0,
+          limit: variables.limit || DONORS_PAGE_SIZE,
+          hasMore: false
+        }
       }
     }
   };
@@ -86,7 +99,7 @@ describe('Donors page', () => {
 
     const mocks = [
       appSettingsMock(),
-      donorsQueryMock([]),
+      donorsPageMock([]),
       {
         request: {
           query: CREATE_DONOR_MUTATION,
@@ -120,7 +133,7 @@ describe('Donors page', () => {
           }
         }
       },
-      donorsQueryMock([
+      donorsPageMock([
         {
           __typename: 'DonorType',
           id: 'donor-2',
@@ -163,7 +176,7 @@ describe('Donors page', () => {
   it('updates a donor and shows success feedback', async () => {
     const mocks = [
       appSettingsMock(),
-      donorsQueryMock([existingDonor]),
+      donorsPageMock([existingDonor]),
       {
         request: {
           query: UPDATE_DONOR_MUTATION,
@@ -193,7 +206,7 @@ describe('Donors page', () => {
           }
         }
       },
-      donorsQueryMock([
+      donorsPageMock([
         {
           ...existingDonor,
           name: 'আপডেটেড ডোনার',
@@ -232,7 +245,7 @@ describe('Donors page', () => {
 
     const mocks = [
       appSettingsMock(),
-      donorsQueryMock([existingDonor]),
+      donorsPageMock([existingDonor]),
       {
         request: {
           query: DELETE_DONOR_MUTATION,
@@ -248,7 +261,7 @@ describe('Donors page', () => {
           }
         }
       },
-      donorsQueryMock([]),
+      donorsPageMock([]),
       dashboardSummaryMock()
     ];
 
