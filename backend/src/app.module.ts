@@ -13,6 +13,7 @@ import { createRequestLimitsPlugin } from './common/graphql/request-limits.plugi
 import { GqlAuthGuard } from './common/guards/gql-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { EmailModule } from './email/email.module';
+import { SmsModule } from './sms/sms.module';
 import { UsersModule } from './users/users.module';
 import { DonorsModule } from './donors/donors.module';
 import { PaymentsModule } from './payments/payments.module';
@@ -87,6 +88,7 @@ import { MonthlyJobRun } from './jobs/entities/monthly-job-run.entity';
     }),
     AuthModule,
     EmailModule,
+    SmsModule,
     UsersModule,
     DonorsModule,
     PaymentsModule,

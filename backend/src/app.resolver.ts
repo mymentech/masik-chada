@@ -31,6 +31,7 @@ import {
 import { UsersService } from './users/users.service';
 import { MonthlySnapshotJobResult } from './jobs/dto/monthly-snapshot-job-result.type';
 import { MonthlySnapshotService } from './jobs/monthly-snapshot.service';
+import { SmsService, normalizeBdPhone, buildPaymentSmsMessage } from './sms/sms.service';
 
 interface GraphqlRequestContext {
   req?: {
@@ -53,6 +54,7 @@ export class AppResolver {
     private readonly reportsService: ReportsService,
     private readonly monthlySnapshotService: MonthlySnapshotService,
     private readonly settingsService: SettingsService,
+    private readonly smsService: SmsService,
   ) {}
 
   @Query(() => User)
@@ -275,6 +277,12 @@ export class AppResolver {
       this.donorsService.donor(donorId),
       this.dashboardService.summary(),
     ]);
+
+    const normalizedPhone = normalizeBdPhone(donor.phone);
+    if (normalizedPhone) {
+      const msg = buildPaymentSmsMessage(donor.name, payment.amount, payment.payment_date);
+      this.smsService.send(normalizedPhone, msg).catch(() => {});
+    }
 
     return {
       payment,
