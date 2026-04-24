@@ -18,11 +18,32 @@ export const LOGIN_MUTATION = gql`
 export const RECORD_PAYMENT_MUTATION = gql`
   mutation RecordPayment($donorId: String!, $amount: Float!, $paymentDate: String!) {
     recordPayment(donorId: $donorId, amount: $amount, paymentDate: $paymentDate) {
-      id
-      donor_id
-      amount
-      payment_date
-      created_at
+      payment {
+        id
+        donor_id
+        amount
+        payment_date
+        created_at
+      }
+      donor {
+        id
+        serial_number
+        name
+        phone
+        address
+        monthly_amount
+        registration_date
+        due_from
+        total_due
+        total_paid
+        balance
+      }
+      dashboard {
+        totalDonors
+        thisMonthCollected
+        totalBalance
+        totalCollectors
+      }
     }
   }
 `;
