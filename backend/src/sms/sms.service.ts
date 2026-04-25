@@ -14,13 +14,13 @@ export function normalizeBdPhone(phone: string | null | undefined): string | nul
   return null;
 }
 
-export function buildPaymentSmsMessage(name: string, amount: number, paymentDate: string | Date): string {
+export function buildPaymentSmsMessage(_name: string, amount: number, paymentDate: string | Date): string {
   const date = new Date(paymentDate);
   const dd = String(date.getDate()).padStart(2, '0');
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
   const formatted = `${dd}/${mm}/${yyyy}`;
-  return `প্রিয় ${name}, আপনার ৳${amount} টাকার মাসিক চাঁদা গৃহীত হয়েছে। তারিখ: ${formatted}। - ময়দানে মুহাম্মাদ`;
+  return `Your monthly subscription of BDT ${amount} received on ${formatted}. Thank you. - Moydane Mohammad`;
 }
 
 @Injectable()
