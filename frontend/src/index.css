@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&display=swap');
+
 @font-face {
   font-family: 'NikoshBAN';
   src: url('/fonts/NikoshBAN.eot');
@@ -71,6 +73,18 @@ a {
 button, input, select, textarea {
   font-family: inherit;
   font-size: inherit;
+}
+
+.arabic-title {
+  font-family: 'Amiri', 'Aref Ruqaa', serif;
+  font-weight: 700;
+  direction: rtl;
+  font-size: 2.25rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-align: center;
+  margin: 0;
+  color: var(--green-800);
 }
 
 /* Layout helpers */
@@ -234,19 +248,21 @@ button, input, select, textarea {
     margin-bottom: 12pt;
   }
 
+  .print-doc-header .arabic-title {
+    font-size: 20pt;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 4pt;
+    color: #000;
+    direction: rtl;
+  }
+
   .print-doc-header h1 {
     font-size: 20pt;
     font-weight: 700;
     margin: 0;
     color: #000;
     letter-spacing: 0.2pt;
-  }
-
-  .print-doc-header .subtitle {
-    font-size: 10pt;
-    color: #000;
-    margin: 3pt 0 0;
-    letter-spacing: 0.3pt;
   }
 
   .print-doc-header .meta {

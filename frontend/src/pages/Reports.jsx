@@ -132,8 +132,8 @@ export default function Reports() {
           @page @bottom-left margin box renders on every subsequent page. */}
       {report && (
         <div className="print-only print-doc-header">
-          <h1>মাসিক রিপোর্ট</h1>
-          <p className="subtitle">ميدان محمد — মাসিক চাঁদা · {monthLabel}</p>
+          <p className="arabic-title">ميدان محمد</p>
+          <h1>মাসিক চাঁদার রিপোর্ট</h1>
           <div className="meta">
             <span>মাস: <span className="pMonth">{monthLabel}</span></span>
             <span>প্রিন্ট: <span className="pDate">{generatedOn}</span></span>
@@ -242,7 +242,7 @@ export default function Reports() {
             }}
           >
             <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
-              মাসিক রিপোর্ট
+              মাসিক চাঁদার রিপোর্ট
             </h1>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
