@@ -5,7 +5,7 @@ import {
   DELETE_DONOR_MUTATION,
   UPDATE_DONOR_MUTATION,
 } from '../graphql/mutations';
-import { APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_PAGE_QUERY } from '../graphql/queries';
+import { ADDRESSES_QUERY, APP_SETTINGS_QUERY, DASHBOARD_SUMMARY_QUERY, DONORS_PAGE_QUERY } from '../graphql/queries';
 import { useIsMobile } from '../context/MobileContext';
 import { useInfiniteDonors } from '../hooks/useInfiniteDonors';
 import PaymentHistory from '../components/PaymentHistory';
@@ -44,7 +44,7 @@ function initialForm() {
 
 const QUICK_AMOUNTS = [50, 100, 200, 500];
 
-function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubmitting }) {
+function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubmitting, addresses }) {
   const [focusedField, setFocusedField] = useState('');
 
   function inputStyle(name) {
@@ -101,12 +101,18 @@ function FormPanel({ editingDonor, form, updateField, onSubmit, onCancel, isSubm
         <label htmlFor="address" style={labelStyle}>ঠিকানা</label>
         <input
           id="address"
+          list="address-suggestions"
           value={form.address}
           onChange={(e) => updateField('address', e.target.value)}
           onFocus={() => setFocusedField('address')}
           onBlur={() => setFocusedField('')}
           style={inputStyle('address')}
         />
+        <datalist id="address-suggestions">
+          {(addresses || []).map((addr) => (
+            <option key={addr} value={addr} />
+          ))}
+        </datalist>
       </div>
 
       <div>
@@ -430,6 +436,10 @@ export default function Donors() {
   const { data: settingsData } = useQuery(APP_SETTINGS_QUERY, {
     fetchPolicy: 'cache-and-network',
   });
+  const { data: addressesData } = useQuery(ADDRESSES_QUERY, {
+    fetchPolicy: 'cache-and-network',
+  });
+  const addresses = addressesData?.addresses ?? [];
   const allowDelete = Boolean(settingsData?.appSettings?.allow_donor_delete);
 
   const [createDonor, createState] = useMutation(CREATE_DONOR_MUTATION);
@@ -827,6 +837,7 @@ export default function Donors() {
                   onSubmit={submitForm}
                   onCancel={() => { beginCreate(); setShowFormSheet(false); }}
                   isSubmitting={isSubmitting}
+                  addresses={addresses}
                 />
               </div>
             </div>
@@ -1100,6 +1111,7 @@ export default function Donors() {
             onSubmit={submitForm}
             onCancel={() => beginCreate()}
             isSubmitting={isSubmitting}
+            addresses={addresses}
           />
         </div>
       </div>
