@@ -12,14 +12,20 @@ export class SettingsService {
   async get(): Promise<AppSetting> {
     let row = await this.repo.findOne({ where: { id: 1 } });
     if (!row) {
-      row = await this.repo.save(this.repo.create({ id: 1, allow_donor_delete: false }));
+      row = await this.repo.save(
+        this.repo.create({ id: 1, allow_donor_delete: false, allow_payment_delete: false }),
+      );
     }
     return row;
   }
 
-  async update(patch: Partial<Pick<AppSetting, 'allow_donor_delete'>>): Promise<AppSetting> {
+  async update(
+    patch: Partial<Pick<AppSetting, 'allow_donor_delete' | 'allow_payment_delete'>>,
+  ): Promise<AppSetting> {
     await this.get();
-    await this.repo.update({ id: 1 }, patch);
+    if (Object.keys(patch).length > 0) {
+      await this.repo.update({ id: 1 }, patch);
+    }
     return (await this.repo.findOne({ where: { id: 1 } }))!;
   }
 }

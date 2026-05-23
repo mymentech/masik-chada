@@ -12,6 +12,10 @@ export class AppSetting {
   allow_donor_delete!: boolean;
 
   @Field()
+  @Column({ type: 'boolean', name: 'allow_payment_delete', default: false })
+  allow_payment_delete!: boolean;
+
+  @Field()
   @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
   updated_at!: Date;
 }

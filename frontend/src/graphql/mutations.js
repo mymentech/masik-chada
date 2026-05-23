@@ -148,10 +148,40 @@ export const ADMIN_DELETE_USER_MUTATION = gql`
 `;
 
 export const UPDATE_APP_SETTINGS_MUTATION = gql`
-  mutation UpdateAppSettings($allowDonorDelete: Boolean!) {
-    updateAppSettings(allowDonorDelete: $allowDonorDelete) {
+  mutation UpdateAppSettings($allowDonorDelete: Boolean, $allowPaymentDelete: Boolean) {
+    updateAppSettings(
+      allowDonorDelete: $allowDonorDelete
+      allowPaymentDelete: $allowPaymentDelete
+    ) {
       allow_donor_delete
+      allow_payment_delete
       updated_at
+    }
+  }
+`;
+
+export const DELETE_PAYMENT_MUTATION = gql`
+  mutation DeletePayment($id: String!) {
+    deletePayment(id: $id) {
+      donor {
+        id
+        serial_number
+        name
+        phone
+        address
+        monthly_amount
+        registration_date
+        due_from
+        total_due
+        total_paid
+        balance
+      }
+      dashboard {
+        totalDonors
+        thisMonthCollected
+        totalBalance
+        totalCollectors
+      }
     }
   }
 `;

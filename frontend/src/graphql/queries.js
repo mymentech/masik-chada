@@ -117,6 +117,7 @@ export const APP_SETTINGS_QUERY = gql`
   query AppSettings {
     appSettings {
       allow_donor_delete
+      allow_payment_delete
       updated_at
     }
   }

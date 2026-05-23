@@ -73,6 +73,21 @@ export class PaymentsService {
     return this.paymentRepo.save(payment);
   }
 
+  async deletePayment(paymentId: string): Promise<{ donor_id: number }> {
+    const id = Number(paymentId);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('Invalid payment id');
+    }
+
+    const payment = await this.paymentRepo.findOne({ where: { id } });
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+
+    await this.paymentRepo.delete({ id });
+    return { donor_id: payment.donor_id };
+  }
+
   async monthCollectedTotal(month?: string): Promise<number> {
     const qb = this.paymentRepo
       .createQueryBuilder('p')

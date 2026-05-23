@@ -15,6 +15,7 @@ import {
 } from './donors/dto/donor-balance.type';
 import { DonorInput } from './donors/dto/donor.input';
 import { Payment } from './payments/entities/payment.entity';
+import { DeletePaymentResult } from './payments/dto/delete-payment-result.type';
 import { RecordPaymentResult } from './payments/dto/record-payment-result.type';
 import { PaymentsService } from './payments/payments.service';
 import { MonthlyReport } from './reports/monthly-report.type';
@@ -206,9 +207,13 @@ export class AppResolver {
   @Roles(UserRole.Admin)
   @Mutation(() => AppSetting)
   updateAppSettings(
-    @Args('allowDonorDelete') allowDonorDelete: boolean,
+    @Args('allowDonorDelete', { nullable: true }) allowDonorDelete?: boolean,
+    @Args('allowPaymentDelete', { nullable: true }) allowPaymentDelete?: boolean,
   ): Promise<AppSetting> {
-    return this.settingsService.update({ allow_donor_delete: allowDonorDelete });
+    const patch: { allow_donor_delete?: boolean; allow_payment_delete?: boolean } = {};
+    if (typeof allowDonorDelete === 'boolean') patch.allow_donor_delete = allowDonorDelete;
+    if (typeof allowPaymentDelete === 'boolean') patch.allow_payment_delete = allowPaymentDelete;
+    return this.settingsService.update(patch);
   }
 
   @Mutation(() => DonorBalance)
@@ -229,6 +234,21 @@ export class AppResolver {
       throw new Error('Donor deletion is disabled. Enable it from settings first.');
     }
     return this.donorsService.deleteDonor(id);
+  }
+
+  @Roles(UserRole.Admin)
+  @Mutation(() => DeletePaymentResult)
+  async deletePayment(@Args('id') id: string): Promise<DeletePaymentResult> {
+    const settings = await this.settingsService.get();
+    if (!settings.allow_payment_delete) {
+      throw new Error('Payment deletion is disabled. Enable it from settings first.');
+    }
+    const { donor_id } = await this.paymentsService.deletePayment(id);
+    const [donor, dashboard] = await Promise.all([
+      this.donorsService.donor(String(donor_id)),
+      this.dashboardService.summary(),
+    ]);
+    return { donor, dashboard };
   }
 
   @Mutation(() => RecordPaymentResult)
